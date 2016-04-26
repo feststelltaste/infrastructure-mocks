@@ -1,0 +1,26 @@
+Purpose of this project
+
+	- The main purpose of this project is to mock necessary database parts 
+	  dependencies for a project, so that it is possible to run a project without 
+	  DB dependencies from network or other infrasturcture
+
+How to start
+
+	Simpliest way, which will fork the DB
+
+		run ant default target: $ ant
+
+
+	or to start and left h2 in console
+
+		you shall always run:
+
+			1. dropdb
+			2. importsql
+			3. startH2
+
+		or alternatively
+		
+			1. cleanStartH2
+
+

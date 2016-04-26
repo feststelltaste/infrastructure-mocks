@@ -1,0 +1,8 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+	<soap:Body>
+		<typ:HelloWorldRepsonse
+			xmlns:typ="http://soapmocks.de">
+			<wow/>
+		</typ:HelloWorldRepsonse>
+	</soap:Body>
+</soap:Envelope>

@@ -1,0 +1,80 @@
+<!--
+Copyright 2016 Peter Bilstein
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<project name="Local H2 Database" default="cleanStartH2">
+
+	<property name="h2.home" value="${basedir}" />
+	<property name="h2.jar" value="${h2.home}/jar/h2-1.4.190.jar" />
+	<property name="h2.db.dir" value="${h2.home}/db" />
+	<property name="h2.port" value="15090" />
+
+	<target name="restartH2" description="Stops, clean imports SQL, Starts H2">
+		<antcall target="stopH2" />
+		<antcall target="cleanImportSql" />
+		<antcall target="startH2" />
+	</target>
+
+	<target name="startH2" depends="checkH2running, echoWhenServerRunning" unless="${h2.started}" description="Starts H2 and imports if not started">
+		<echo message="Starting H2" />
+		<antcall target="cleanImportSql" />
+		<java classname="org.h2.tools.Server" 
+			fork="true" spawn="true">
+			<classpath>
+                        	<pathelement location="${h2.jar}"/>
+		        </classpath>
+                        <arg value="-tcp"/>
+			<arg value="-tcpPort"/>
+			<arg value="${h2.port}"/>
+                        <arg value="-tcpAllowOthers"/>
+                        <arg value="-baseDir"/>
+                        <arg value="${h2.db.dir}"/>
+                </java>
+	</target>
+
+	<target name="stopH2" depends="checkH2running, echoWhenServerRunning" if="${h2.started}" description="Stops H2 if started">
+                <echo message="Stopping H2" />
+                <java classname="org.h2.tools.Server">
+			<classpath>
+                                <pathelement location="${h2.jar}"/>
+                        </classpath>
+                        <arg value="-tcpShutdown"/>
+                        <arg value="tcp://localhost:${h2.port}"/>
+                </java>
+        </target>
+
+	<target name="cleanImportSql" description="Deletes DB and imports SQL">
+		<delete dir="${h2.db.dir}" failonerror="false" />
+		<echo message="Importing SQL script" />
+                <java classname="org.h2.tools.RunScript">
+			<classpath>
+                                <pathelement location="${h2.jar}"/>
+                        </classpath>
+                        <arg value="-url"/>
+                        <arg value="jdbc:h2:${h2.db.dir}/localDB"/>
+			<arg value="-script"/>
+			<arg value="${h2.home}/sql/import.sql"/>
+                </java>
+        </target>
+
+	<target name="checkH2running">
+		<condition property="h2.started">
+		  <socket server="localhost" port="${h2.port}" />
+		</condition>
+        </target>
+
+	<target name="echoWhenServerRunning" depends="checkH2running" if="h2.started">
+		<echo message="H2 is running" />
+	</target>
+</project>

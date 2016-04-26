@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE project>
+<!--
+Copyright 2016 Peter Bilstein
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<project name="Mocks" default="cleanStartMocks">
+
+	<property name="mocks.home" value="${basedir}" />
+	<property name="mocks.log.dir" value="${mocks.home}/log" />
+	<property name="mocks.log" value="${mocks.log.dir}/soap-mocks.log" />
+	<property name="maven.opts" value="-Xmx512m -XX:PermSize=256m" />
+	<property name="server.port" value="12080" />
+
+	<target name="cleanStartMocks" description="clean, build and start mocks">
+		<antcall target="cleanStartMocksIfNeeded" />
+		<echo message="Wait for server to come up" />
+		<waitfor maxwait="3" maxwaitunit="minute" checkevery="500" timeoutproperty="servertimeout">
+			<socket server="localhost" port="${server.port}" />
+		</waitfor>
+		<antcall target="servertimeoutcheck" />
+		<echo message="Server Started" />
+	</target>
+
+	<target name="cleanStartMocksIfNeeded" depends="checkTomcatRunning" unless="tomcat.started">
+		<mkdir dir="${mocks.log.dir}" />
+		<mvn mavenTargets="clean install tomcat7:run" mavenopts="${maven.opts}" />
+	</target>
+
+	<target name="stopMocks" depends="checkTomcatRunning" if="${tomcat.started}">
+		<get src="http://localhost:${server.port}/soap-mocks/shutdown?shutdown=SECRET" 
+		    dest="${mocks.home}/target/shutdownmessage"
+		    usetimestamp="true"/>
+	</target>
+
+	<target name="servertimeoutcheck" if="servertimeout">
+		<fail message="Server did not come up" />
+	</target>
+
+	<target name="checkTomcatRunning">
+		<condition property="tomcat.started">
+			<socket server="localhost" port="${server.port}" />
+		</condition>
+	</target>
+
+
+	<macrodef name="mvn">
+		<attribute name="mavenTargets" />
+		<attribute name="mavenOpts" />
+		<sequential>
+			<exec spawn="true" executable="mvn.bat" osfamily="windows">
+				<env key="MAVEN_OPTS" value="@{mavenOpts}" />
+				<arg line="@{mavenTargets}"/>
+				<arg value="-l"/>
+				<arg value="${mocks.log}"/>
+			</exec>
+			<exec spawn="true" executable="mvn" osfamily="mac">
+				<env key="MAVEN_OPTS" value="@{mavenOpts}" />
+				<arg line="@{mavenTargets}"/>
+				<arg value="-l"/>
+				<arg value="${mocks.log}"/>
+			</exec>
+			<exec spawn="true" executable="mvn" osfamily="unix">
+				<env key="MAVEN_OPTS" value="@{mavenOpts}" />
+				<arg line="@{mavenTargets}"/>
+				<arg value="-l"/>
+				<arg value="${mocks.log}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+</project>

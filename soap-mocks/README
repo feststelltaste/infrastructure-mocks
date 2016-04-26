@@ -1,0 +1,73 @@
+Purpose of this project
+
+	- The main purpose of this project is to mock necessary external soap
+	  service dependencies for a project, so that it is possible to run a 
+	  project without dependencies to other systems
+  
+
+
+Add SOAP Mocks
+
+	- There are two ways how to add mocks. The first way (generic soap mocks)
+	  is very easy to implement, but limited in its logic. The second one (JaxWs) 
+	  is more complicated, but you can add more logic on it using Java implementation.
+
+	* Add Generic Soap Mock
+
+	1. Add a .config file to folder /src/main/resources/generic_soap_mocks like this:
+	
+	url=/someservice/v1
+	responseFile=someservice-v1-response.xml
+	requestContains=someId4711
+	
+	2. Add the response file to be sent also to folder /src/main/resources/generic_soap_mocks
+	
+	In this case: someservice-v1-response.xml containing the response xml.
+		
+	That's it!
+	
+	/soap-mocks/someservice/v1 will serve what you want
+
+
+	* Add new JAXWS Services
+
+	1. add wsdl to /src/wsdl
+	
+	2. configure pom.xml and add section
+	
+		
+		<execution>
+			<id>HelloServiceWsdl</id>
+			<goals>
+				<goal>wsimport</goal>
+			</goals>
+			<configuration>
+				<wsdlFiles>
+					<wsdlFile>HelloService.wsdl</wsdlFile>
+				</wsdlFiles>
+				<packageName>soapmocks.generated.helloservice</packageName>
+				<!-- Without this, multiple WSDLs won't be processed :( -->
+				<staleFile>${project.build.directory}/jaxws/stale/wsdl.HelloServiceWsdl.done</staleFile>
+			</configuration>
+		</execution>
+		
+	3. implement PortType (see e.g. SomeServicePortType)
+	
+	4. Register endpoint for porttype in src/main/webapp/WEB-INF/sun-jaxws.xml
+	
+
+License
+
+Copyright 2016 Peter Bilstein
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
