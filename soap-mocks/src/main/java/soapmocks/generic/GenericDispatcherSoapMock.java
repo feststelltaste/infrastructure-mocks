@@ -26,10 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import soapmocks.generic.filemapping.FileMapping;
+import soapmocks.generic.filemapping.StaticFileHandler;
 import soapmocks.generic.filemapping.GenericSoapResponse;
 import soapmocks.generic.log.MockPercentageLog;
-import soapmocks.generic.proxy.GenericProxyMapping;
+import soapmocks.generic.proxy.ProxyHandler;
 import soapmocks.generic.servlet.BackupHttpServletRequest;
 import soapmocks.generic.servlet.BackupHttpServletResponse;
 import soapmocks.util.ProxyDelegator;
@@ -41,13 +41,13 @@ public class GenericDispatcherSoapMock extends
 
     private MockPercentageLog mockPercentageLog = new MockPercentageLog();
 
-    private FileMapping fileMapping;
+    private StaticFileHandler staticFileHandler;
 
-    private GenericProxyMapping genericProxyMapping;
+    private ProxyHandler proxyHandler;
 
     public GenericDispatcherSoapMock() throws IOException, URISyntaxException {
-	fileMapping = new FileMapping();
-	genericProxyMapping = new GenericProxyMapping();
+	staticFileHandler = new StaticFileHandler();
+	proxyHandler = new ProxyHandler();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class GenericDispatcherSoapMock extends
 	    throws ServletException, IOException {
 	String uri = req.getRequestURI();
 	System.out.println("GET " + uri);
-	if (!fileMapping.containsKey(uri)) {
+	if (!staticFileHandler.containsKey(uri)) {
 	    super.doGet(req, resp);
 	} else {
 	    send(resp, new ByteArrayInputStream(("Found " + uri).getBytes()));
@@ -94,12 +94,12 @@ public class GenericDispatcherSoapMock extends
 		respOriginal);
 	String uri = req.getRequestURI();
 	System.out.println("POST " + uri);
-	if (!fileMapping.containsKey(uri)) {
+	if (!staticFileHandler.containsKey(uri)) {
 	    jaxWsFirstThenProxy(req, resp, uri);
 	} else {
 	    resp.setHeader("Content-Type", "text/xml;charset=utf-8");
 	    GenericSoapResponse soapResponse;
-	    soapResponse = fileMapping.findResponseByPropertiesAndRequest(req,
+	    soapResponse = staticFileHandler.findResponseByPropertiesAndRequest(req,
 		    uri);
 	    if (soapResponse != null
 		    && soapResponse.getResponseStream() != null) {
@@ -129,10 +129,10 @@ public class GenericDispatcherSoapMock extends
 	    System.out.println("### MOCKED Response sent. "
 		    + mockPercentageLog.logMock() + "\n");
 	} else {
-	    if (genericProxyMapping.isProxy(uri)) {
+	    if (proxyHandler.isProxy(uri)) {
 		long time = System.currentTimeMillis();
 		System.out.println("Using Proxy now...");
-		genericProxyMapping.doPost(uri, req, resp);
+		proxyHandler.doPost(uri, req, resp);
 		resp.commit();
 		mockPercentageLog.logProxy();
 		time = System.currentTimeMillis() - time;

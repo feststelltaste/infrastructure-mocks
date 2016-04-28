@@ -36,12 +36,12 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 
 import soapmocks.generic.Constants;
 
-public class FileMapping {
+public class StaticFileHandler {
 
     private static final String GENERIC_SOAP_DIR = "/generic_soap_mocks/";
     private Map<String, List<Properties>> URL_TO_FILE_MAPPING = new HashMap<String, List<Properties>>();
 
-    public FileMapping() throws IOException, URISyntaxException {
+    public StaticFileHandler() throws IOException, URISyntaxException {
 	Collection<File> configFiles = findConfigFilesInGenericSoapMocks();
 	for (File configFile : configFiles) {
 	    Properties config = new Properties();

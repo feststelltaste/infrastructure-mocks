@@ -35,13 +35,13 @@ import org.apache.commons.io.IOUtils;
 import soapmocks.generic.Constants;
 import soapmocks.util.ProxyDelegator;
 
-public class GenericProxyMapping {
+public class ProxyHandler {
 
     private static final GenericProxyCounter COUNTER = new GenericProxyCounter();
     private static final String PROXY_FILE = "/proxy.properties";
     private final Properties proxies = new Properties();
 
-    public GenericProxyMapping() throws IOException {
+    public ProxyHandler() throws IOException {
 	proxies.load(getClass().getResourceAsStream(PROXY_FILE));
     }
 
