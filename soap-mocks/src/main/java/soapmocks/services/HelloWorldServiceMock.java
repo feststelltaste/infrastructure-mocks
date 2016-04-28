@@ -12,14 +12,24 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
-package soapmocks.generic;
+ */
+package soapmocks.services;
 
-public class GenericMockCreatorSingleResult {
+import javax.jws.WebService;
 
-	String id;
-	
-	String request;
-	
-	String response;
+import soapmocks.generated.helloservice.HelloWorld;
+
+@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld")
+public class HelloWorldServiceMock implements HelloWorld {
+
+    @Override
+    public String sayHello(String name) {
+
+	return "Yeaaaah Hello " + name;
+
+	// This is how to use a proxy
+	// ProxyDelegator.toProxy();
+	// return null;
+    }
+
 }

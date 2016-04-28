@@ -20,7 +20,7 @@ limitations under the License.
 	<property name="mocks.home" value="${basedir}" />
 	<property name="mocks.log.dir" value="${mocks.home}/log" />
 	<property name="mocks.log" value="${mocks.log.dir}/soap-mocks.log" />
-	<property name="maven.opts" value="-Xmx512m -XX:PermSize=256m" />
+	<property name="maven.opts" value="-Xmx512m -XX:PermSize=256m -Dfile.encoding=UTF-8" />
 	<property name="server.port" value="12080" />
 
 	<target name="cleanStartMocks" description="clean, build and start mocks">

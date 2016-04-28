@@ -12,266 +12,160 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package soapmocks.generic;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 
-public class GenericDispatcherSoapMock extends com.sun.xml.ws.transport.http.servlet.WSServlet {
+import soapmocks.generic.filemapping.FileMapping;
+import soapmocks.generic.filemapping.GenericSoapResponse;
+import soapmocks.generic.log.MockPercentageLog;
+import soapmocks.generic.proxy.GenericProxyMapping;
+import soapmocks.generic.servlet.BackupHttpServletRequest;
+import soapmocks.generic.servlet.BackupHttpServletResponse;
+import soapmocks.util.ProxyDelegator;
 
-	private static final long serialVersionUID = 1L;
+public class GenericDispatcherSoapMock extends
+	com.sun.xml.ws.transport.http.servlet.WSServlet {
 
-	private Map<String,List<Properties>> URL_TO_FILE_MAPPING = new HashMap<String, List<Properties>>();
-	
-	private static final String SOAP_MOCKS_CONTEXT = "/soap-mocks";
-	private static final String GENERIC_SOAP_DIR = "/generic_soap_mocks/";
-	
-	public GenericDispatcherSoapMock() throws IOException, URISyntaxException {
-		Collection<File> configFiles = findConfigFilesInGenericSoapMocks();
-		for (File configFile : configFiles) {
-			Properties config = new Properties();
-			config.load(new FileInputStream(configFile));
-			configure(configFile.getName(), config);
-		}
+    private static final long serialVersionUID = 1L;
+
+    private MockPercentageLog mockPercentageLog = new MockPercentageLog();
+
+    private FileMapping fileMapping;
+
+    private GenericProxyMapping genericProxyMapping;
+
+    public GenericDispatcherSoapMock() throws IOException, URISyntaxException {
+	fileMapping = new FileMapping();
+	genericProxyMapping = new GenericProxyMapping();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	    throws ServletException {
+	try {
+	    doGetInternal(req, resp);
+	} catch (Throwable t) {
+	    t.printStackTrace();
+	    throw new RuntimeException(t);
 	}
+    }
 
-
-	private Collection<File> findConfigFilesInGenericSoapMocks() throws URISyntaxException {
-		URL genericSoapDirResource = getClass().getResource(GENERIC_SOAP_DIR);
-		if(genericSoapDirResource==null) {
-			System.out.println("No generic soap files found.");
-			return Collections.emptyList();
-		}
-		File genericSoapDirFile = new File(genericSoapDirResource.toURI());
-		Collection<File> urlFiles = FileUtils.listFiles(genericSoapDirFile, new IOFileFilter() {
-			@Override
-			public boolean accept(File arg0, String arg1) {
-				return arg0.getName().endsWith(".config");
-			}
-			@Override
-			public boolean accept(File arg0) {
-				return arg0.getName().endsWith(".config");
-			}
-		}, new IOFileFilter() {
-			@Override
-			public boolean accept(File arg0, String arg1) {
-				return true;
-			}
-			
-			@Override
-			public boolean accept(File arg0) {
-				return true;
-			}
-		});
-		return urlFiles;
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	    throws ServletException {
+	try {
+	    ProxyDelegator.reset();
+	    doPostInternal(req, resp);
+	} catch (Throwable t) {
+	    t.printStackTrace();
+	    throw new RuntimeException(t);
+	} finally {
+	    ProxyDelegator.reset();
 	}
+    }
 
-	
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException {
-		try {
-			doGetInternal(req, resp);
-		} catch (Throwable t) {
-			t.printStackTrace();
-			throw new RuntimeException(t);
-		}
+    private void doGetInternal(HttpServletRequest req, HttpServletResponse resp)
+	    throws ServletException, IOException {
+	String uri = req.getRequestURI();
+	System.out.println("GET " + uri);
+	if (!fileMapping.containsKey(uri)) {
+	    super.doGet(req, resp);
+	} else {
+	    send(resp, new ByteArrayInputStream(("Found " + uri).getBytes()));
 	}
+    }
 
-	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException {
-		try {
-			doPostInternal(req, resp);
-		} catch (Throwable t) {
-			t.printStackTrace();
-			throw new RuntimeException(t);
-		}
+    private void doPostInternal(HttpServletRequest requestOriginal,
+	    HttpServletResponse respOriginal) throws Exception {
+	BackupHttpServletRequest req = new BackupHttpServletRequest(
+		requestOriginal);
+	BackupHttpServletResponse resp = new BackupHttpServletResponse(
+		respOriginal);
+	String uri = req.getRequestURI();
+	System.out.println("POST " + uri);
+	if (!fileMapping.containsKey(uri)) {
+	    jaxWsFirstThenProxy(req, resp, uri);
+	} else {
+	    resp.setHeader("Content-Type", "text/xml;charset=utf-8");
+	    GenericSoapResponse soapResponse;
+	    soapResponse = fileMapping.findResponseByPropertiesAndRequest(req,
+		    uri);
+	    if (soapResponse != null
+		    && soapResponse.getResponseStream() != null) {
+		int code = soapResponse.getResponseCode();
+		resp.setStatus(code);
+		send(resp, soapResponse.getResponseStream());
+		resp.commit();
+		System.out.println("Response sent (" + code + "). "
+			+ mockPercentageLog.logMock() + "\n");
+	    } else {
+		sendFault(resp);
+		resp.commit();
+		System.out.println("Fault sent. " + mockPercentageLog.logMock()
+			+ " \n");
+	    }
 	}
+    }
 
-	
-
-	private void doGetInternal(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		String uri = req.getRequestURI();
-		System.out.println("GET " + uri);
-		if(!URL_TO_FILE_MAPPING.containsKey(uri)) {
-			super.doGet(req, resp);
-		} else {
-			send(resp, new ByteArrayInputStream(("Found "+uri).getBytes()));
-		}
+    private void jaxWsFirstThenProxy(BackupHttpServletRequest req,
+	    BackupHttpServletResponse resp, String uri)
+	    throws ServletException, IOException {
+	super.doPost(req, resp);
+	if (!ProxyDelegator.isDelegateToProxy()
+		&& !resp.getResponse().trim().isEmpty()) {
+	    resp.commit();
+	    System.out.println(resp.getResponse());
+	    System.out.println("### MOCKED Response sent. "
+		    + mockPercentageLog.logMock() + "\n");
+	} else {
+	    if (genericProxyMapping.isProxy(uri)) {
+		long time = System.currentTimeMillis();
+		System.out.println("Using Proxy now...");
+		genericProxyMapping.doPost(uri, req, resp);
+		resp.commit();
+		mockPercentageLog.logProxy();
+		time = System.currentTimeMillis() - time;
+		System.out.println("### Proxy Response sent (took " + time
+			+ "ms) \n");
+	    } else {
+		throw new RuntimeException("No mock or proxy found");
+	    }
 	}
+    }
 
+    private void sendFault(HttpServletResponse resp) throws IOException {
+	String message = "SOAPMOCKS did not find a fitting response for the given request.";
+	String fault = "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
+		+ "	<SOAP-ENV:Header/>\n"
+		+ "	<SOAP-ENV:Body>\n"
+		+ "		<SOAP-ENV:Fault>\n"
+		+ "			<faultcode>SOAP-ENV:Server</faultcode>\n"
+		+ "			<faultstring>"
+		+ message
+		+ "</faultstring>\n"
+		+ "			<faultactor>http://soapmocks.de/mocks</faultactor>\n"
+		+ "			<detail></detail>\n"
+		+ "		</SOAP-ENV:Fault>\n"
+		+ "	</SOAP-ENV:Body>\n" + "</SOAP-ENV:Envelope>";
+	resp.setStatus(500);
+	IOUtils.copy(new ByteArrayInputStream(fault.getBytes()),
+		resp.getOutputStream());
+    }
 
-	private void doPostInternal(HttpServletRequest req, HttpServletResponse resp)
-			throws Exception {
-		String uri = req.getRequestURI();
-		System.out.println("POST " + uri);
-		if(!URL_TO_FILE_MAPPING.containsKey(uri)) {
-			super.doPost(req, resp);
-			if(resp.isCommitted()) {
-				System.out.println("Response sent\n");
-			} else {
-				throw new Exception("No mock service found, sent 404");
-			}
-		} else {
-			resp.setHeader("Content-Type", "text/xml;charset=utf-8");
-			GenericSoapResponse soapResponse;
-			soapResponse = findResponseByPropertiesAndRequest(req, uri);
-			if(soapResponse!=null && soapResponse.getResponseStream()!=null) {
-				int code = soapResponse.getResponseCode();
-				resp.setStatus(code);
-				send(resp, soapResponse.getResponseStream());
-				System.out.println("Response sent ("+code+")\n");
-			} else {
-				sendFault(resp);
-				System.out.println("Fault sent\n");
-			}
-		}
-	}
+    private void send(HttpServletResponse resp, InputStream soapResponse)
+	    throws IOException {
+	IOUtils.copy(soapResponse, resp.getOutputStream());
+    }
 
-	private void sendFault(HttpServletResponse resp) throws IOException {
-		String message = "SOAPMOCKS did not find a fitting response for the given request.";
-		String fault = 
-				"<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" + 
-				"	<SOAP-ENV:Header/>\n" +
-				"	<SOAP-ENV:Body>\n" + 
-				"		<SOAP-ENV:Fault>\n" +
-				"			<faultcode>SOAP-ENV:Server</faultcode>\n" + 
-				"			<faultstring>"+message+"</faultstring>\n" + 
-				"			<faultactor>http://soapmocks.de/mocks</faultactor>\n" + 
-				"			<detail></detail>\n" +
-				"		</SOAP-ENV:Fault>\n" + 
-				"	</SOAP-ENV:Body>\n" +
-				"</SOAP-ENV:Envelope>";
-		resp.setStatus(500);
-		IOUtils.copy(new ByteArrayInputStream(fault.getBytes()), resp.getOutputStream());
-	}
-
-
-	private void send(HttpServletResponse resp, InputStream soapResponse) throws IOException {
-		IOUtils.copy(soapResponse, resp.getOutputStream());
-	}
-
-	
-	private GenericSoapResponse findResponseByPropertiesAndRequest(HttpServletRequest hsr, String uri) throws IOException {
-		List<Properties> propertiesList = URL_TO_FILE_MAPPING.get(uri);
-		String request = null;
-		for (Properties properties : propertiesList) {
-			if(hasAnyRequestCondition(properties)) {
-				request = createRequestStringIfNeeded(hsr, request);
-				boolean conditionMet = checkConditionMet(request, properties);
-				if(conditionMet) {
-					String responseFile = responseFile(properties);
-					System.out.println("Generic conditional ResponseFile: " + responseFile);
-					return new GenericSoapResponse(getClass().getResourceAsStream(responseFile),null);
-				}
-			}
-		}
-		for (Properties properties : propertiesList) {
-			if(!hasRequestContainsCondition(properties)) {
-				request = createRequestStringIfNeeded(hsr, request);
-				String responseFile = responseFile(properties);
-				System.out.println("Generic default ResponseFile: " + responseFile);
-				return new GenericSoapResponse(getClass().getResourceAsStream(responseFile),null);
-			}
-		}
-		System.out.println("No condition met and no default response found for url " + uri);
-		System.out.println("Request was:\n"+createRequestStringIfNeeded(hsr, request));
-		return null;
-	}
-
-
-	private String createRequestStringIfNeeded(HttpServletRequest hsr, String request)
-			throws IOException {
-		if(request==null) {
-			request = IOUtils.toString(hsr.getInputStream());
-		}
-		return request;
-	}
-
-
-	private boolean checkConditionMet(String request, Properties properties) {
-		boolean conditionMet = true;
-		if(hasRequestContainsCondition(properties)) {
-			String[] requestContains = requestContainsCondition(properties);
-			for (String condition : requestContains) {
-				if(!request.contains(condition)) {
-					conditionMet = false;
-				}
-			}
-		}
-		if(hasRequestContainsNotCondition(properties)) {
-			String[] requestContainsNot = requestContainsNotCondition(properties);
-			for (String condition : requestContainsNot) {
-				if(request.contains(condition)) {
-					conditionMet = false;
-				}
-			}
-		}
-		return conditionMet;
-	}
-	
-	private void configure(String config, Properties file) {
-		String url = url(file);
-		String responseFile = responseFile(file);
-		System.out.println("#### GenericSoap Mock " + config + "\n#### " + url + "\n#### " + responseFile + "\n");
-		String completeUrl = SOAP_MOCKS_CONTEXT+url;
-		if(!URL_TO_FILE_MAPPING.containsKey(completeUrl)) {
-			List<Properties> properties = new ArrayList<Properties>();
-			URL_TO_FILE_MAPPING.put(completeUrl, properties);
-		}
-		URL_TO_FILE_MAPPING.get(completeUrl).add(file);
-	}
-
-	private String responseFile(Properties file) {
-		return GENERIC_SOAP_DIR+file.getProperty("responseFile");
-	}
-
-	private String url(Properties file) {
-		return file.getProperty("url");
-	}	
-	
-	private String[] requestContainsCondition(Properties file) {
-		return file.getProperty("requestContains").split(" ");
-	}
-	
-	private String[] requestContainsNotCondition(Properties file) {
-		return file.getProperty("requestContainsNot").split(" ");
-	}
-	
-	private boolean hasRequestContainsCondition(Properties file) {
-		return file.getProperty("requestContains")!=null;
-	}
-
-	private boolean hasRequestContainsNotCondition(Properties file) {
-		return file.getProperty("requestContainsNot")!=null;
-	}	
-
-	private boolean hasAnyRequestCondition(Properties properties) {
-		return hasRequestContainsCondition(properties) || hasRequestContainsNotCondition(properties);
-	}
-	
 }

@@ -12,26 +12,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package soapmocks.generic;
 
-import java.io.InputStream;
+public class Constants {
 
-public class GenericSoapResponse {
+    public static final String SOAP_MOCKS_CONTEXT = "/soap-mocks";
 
-	public GenericSoapResponse(InputStream inputStream, String code) {
-		responseStream = inputStream;
-		responseCode = code != null ? Integer.parseInt(code) : 200;
-	}
-	
-	public InputStream getResponseStream() {
-		return responseStream;
-	}
-
-	public int getResponseCode() {
-		return responseCode;
-	}
-
-	private final InputStream responseStream;
-	private final int responseCode;
 }

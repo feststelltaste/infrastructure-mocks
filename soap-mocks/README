@@ -3,7 +3,10 @@ Purpose of this project
 	- The main purpose of this project is to mock necessary external soap
 	  service dependencies for a project, so that it is possible to run a 
 	  project without dependencies to other systems
-  
+ 
+Code formatting
+
+	- Java Conventions Formatting
 
 
 Add SOAP Mocks

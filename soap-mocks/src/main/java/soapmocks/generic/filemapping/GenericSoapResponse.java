@@ -12,19 +12,26 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
-package soapmocks.helloservice;
+ */
+package soapmocks.generic.filemapping;
 
-import javax.jws.WebService;
+import java.io.InputStream;
 
-import soapmocks.generated.helloservice.HelloWorld;
+public class GenericSoapResponse {
 
-@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld")
-public class HelloWorldServiceMock implements HelloWorld {
+    public GenericSoapResponse(InputStream inputStream, String code) {
+	responseStream = inputStream;
+	responseCode = code != null ? Integer.parseInt(code) : 200;
+    }
 
-	@Override
-	public String sayHello(String name) {
-		return "Yeaaaah Hello " + name;
-	}
+    public InputStream getResponseStream() {
+	return responseStream;
+    }
 
+    public int getResponseCode() {
+	return responseCode;
+    }
+
+    private final InputStream responseStream;
+    private final int responseCode;
 }
