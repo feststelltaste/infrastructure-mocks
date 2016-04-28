@@ -28,7 +28,7 @@ import org.apache.commons.io.IOUtils;
 
 import soapmocks.generic.filemapping.StaticFileHandler;
 import soapmocks.generic.filemapping.GenericSoapResponse;
-import soapmocks.generic.log.MockPercentageLog;
+import soapmocks.generic.logging.MockPercentageLog;
 import soapmocks.generic.proxy.ProxyHandler;
 import soapmocks.generic.servlet.BackupHttpServletRequest;
 import soapmocks.generic.servlet.BackupHttpServletResponse;
