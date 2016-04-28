@@ -16,6 +16,7 @@ limitations under the License.
 package soapmocks.util;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
@@ -23,33 +24,56 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 public class XmlUtil {
 
-    public <T> T unmarshal(String file, Class<T> classForT) {
-	try {
-	    JAXBContext jaxbContext = JAXBContext.newInstance(classForT);
-	    Unmarshaller jaxbUnmarshaller;
-	    jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-	    InputStream fileInputStream = getClass().getResourceAsStream(file);
-	    failIfStreamNotFound(file, fileInputStream);
-	    Source source = new StreamSource(fileInputStream);
-	    JAXBElement<T> jaxbElement = jaxbUnmarshaller.unmarshal(source,
-		    classForT);
-	    fileInputStream.close();
-	    return jaxbElement.getValue();
-	} catch (Exception e) {
-	    throw new RuntimeException(e);
-	}
+    private String baseDir = "";
+
+    public XmlUtil() {
     }
 
-    public <T> T unmarshal(String file, String fromElement, Class<T> classForT) {
+    public XmlUtil(String baseDir) {
+	if (baseDir == null) {
+	    throw new NullPointerException();
+	}
+	this.baseDir = baseDir;
+    }
+
+    /**
+     * With searching for defaultXml true
+     */
+    public <T> T unmarshal(Class<T> classForT, String method,
+	    String... parameters) {
+	return unmarshal(classForT, true, method, parameters);
+    }
+
+    public <T> T unmarshal(Class<T> classForT, boolean defaultXml,
+	    String method, String... parameters) {
+	String filename = findFileFromMethodsAndParameter(defaultXml, method,
+		parameters);
+	if (filename == null) {
+	    ProxyDelegator.toProxy();
+	    throw new QuietException("file not found");
+	}
+	return unmarshal(filename, classForT);
+    }
+
+    public <T> T unmarshal(String xmlfile, Class<T> classForT) {
+	String simpleName = classForT.getSimpleName();
+	String fromElement = Character.toLowerCase(simpleName.charAt(0))
+		+ (simpleName.length() > 1 ? simpleName.substring(1) : "");
+	return unmarshal(xmlfile, fromElement, classForT);
+    }
+
+    public <T> T unmarshal(String xmlfile, String fromElement,
+	    Class<T> classForT) {
 	try {
+	    xmlfile = baseDir + xmlfile;
 	    XMLInputFactory xif = XMLInputFactory.newInstance();
-	    InputStream fileInputStream = getClass().getResourceAsStream(file);
-	    failIfStreamNotFound(file, fileInputStream);
+	    InputStream fileInputStream = getClass().getResourceAsStream(
+		    xmlfile);
+	    failIfStreamNotFound(xmlfile, fileInputStream);
 	    StreamSource xml = new StreamSource(fileInputStream);
 	    XMLStreamReader xsr = xif.createXMLStreamReader(xml);
 	    xsr.next();
@@ -63,17 +87,59 @@ public class XmlUtil {
 	    JAXBElement<T> jaxbElement = unmarshaller.unmarshal(xsr, classForT);
 	    xsr.close();
 	    fileInputStream.close();
-	    System.out.println("JaxWS ResponseFile: " + file);
+	    System.out.println("JaxWS ResponseFile: " + xmlfile);
 	    return jaxbElement.getValue();
 	} catch (Exception e) {
-	    throw new RuntimeException(e);
+	    ProxyDelegator.toProxy();
+	    throw new QuietException(e);
 	}
     }
 
     private void failIfStreamNotFound(String file, InputStream fileInputStream)
 	    throws FileNotFoundException {
 	if (fileInputStream == null) {
-	    throw new FileNotFoundException(file + " not found.");
+	    throw new QuietException(file + " not found.");
 	}
     }
+
+    private String findFileFromMethodsAndParameter(boolean defaultXml,
+	    String method, String... parameters) {
+	String filename = "/" + method;
+	for (String parameter : parameters) {
+	    filename += "-" + parameter;
+	}
+	filename += ".xml";
+	InputStream fileInputStream = getClass().getResourceAsStream(
+		baseDir + filename);
+
+	if (fileInputStream == null) {
+	    if (defaultXml) {
+		filename = "/" + method + "-default.xml";
+	    } else {
+		ProxyDelegator.toProxy();
+		throw new QuietException(filename + " not found");
+	    }
+	} else {
+	    closeQuietly(fileInputStream);
+	}
+
+	fileInputStream = getClass().getResourceAsStream(baseDir + filename);
+	if (fileInputStream == null) {
+	    ProxyDelegator.toProxy();
+	    throw new QuietException(filename + " not found");
+	} else {
+	    closeQuietly(fileInputStream);
+	}
+
+	return filename;
+    }
+
+    private void closeQuietly(InputStream fileInputStream) {
+	try {
+	    fileInputStream.close();
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+    }
+
 }
