@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import soapmocks.generic.filemapping.StaticFileHandler;
 import soapmocks.generic.filemapping.GenericSoapResponse;
+import soapmocks.generic.filemapping.StaticFileHandler;
 import soapmocks.generic.logging.MockPercentageLog;
 import soapmocks.generic.proxy.ProxyHandler;
 import soapmocks.generic.servlet.BackupHttpServletRequest;
@@ -99,8 +99,8 @@ public class GenericDispatcherSoapMock extends
 	} else {
 	    resp.setHeader("Content-Type", "text/xml;charset=utf-8");
 	    GenericSoapResponse soapResponse;
-	    soapResponse = staticFileHandler.findResponseByPropertiesAndRequest(req,
-		    uri);
+	    soapResponse = staticFileHandler
+		    .findResponseByPropertiesAndRequest(req, uri);
 	    if (soapResponse != null
 		    && soapResponse.getResponseStream() != null) {
 		int code = soapResponse.getResponseCode();
@@ -130,14 +130,11 @@ public class GenericDispatcherSoapMock extends
 		    + mockPercentageLog.logMock() + "\n");
 	} else {
 	    if (proxyHandler.isProxy(uri)) {
-		long time = System.currentTimeMillis();
 		System.out.println("Using Proxy now...");
-		proxyHandler.doPost(uri, req, resp);
+		long time = proxyHandler.doPost(uri, req, resp);
 		resp.commit();
-		mockPercentageLog.logProxy();
-		time = System.currentTimeMillis() - time;
 		System.out.println("### Proxy Response sent (took " + time
-			+ "ms) \n");
+			+ "ms). " + mockPercentageLog.logProxy() + "\n");
 	    } else {
 		throw new RuntimeException("No mock or proxy found");
 	    }

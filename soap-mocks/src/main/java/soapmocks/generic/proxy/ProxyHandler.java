@@ -45,7 +45,10 @@ public class ProxyHandler {
 	proxies.load(getClass().getResourceAsStream(PROXY_FILE));
     }
 
-    public void doPost(String uri, HttpServletRequest req,
+    /**
+     * @return Time in millis that the proxy call took
+     */
+    public long doPost(String uri, HttpServletRequest req,
 	    HttpServletResponse resp) throws IOException {
 	ProxyDelegator.reset();
 	long count = COUNTER.incrementAndGet();
@@ -54,8 +57,10 @@ public class ProxyHandler {
 
 	System.out.println("REQ-" + count + ": " + new String(requestString));
 
+	long time = System.currentTimeMillis();
 	ProxyResult proxyResult = sendPost(proxyUrl(uri),
 		mapHeaderFromRequest(req), requestString);
+	time = System.currentTimeMillis() - time;
 
 	System.out.println("RESP-" + count + ": "
 		+ new String(proxyResult.body));
@@ -63,6 +68,7 @@ public class ProxyHandler {
 	copyHeaderToResponse(resp, proxyResult);
 	resp.setStatus(proxyResult.responseCode);
 	IOUtils.write(proxyResult.body, resp.getOutputStream());
+	return time;
     }
 
     public boolean isProxy(String uri) {
