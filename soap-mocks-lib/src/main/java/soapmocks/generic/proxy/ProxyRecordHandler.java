@@ -32,7 +32,7 @@ final class ProxyRecordHandler {
 	    ProxyServiceIdentifier serviceIdentifier = ProxyDelegator.getServiceIdentifier();
 	    File file = new File(getProxyTraceDir()+serviceIdentifier.generateFilename());
 	    LOG.out("Proxy recorded to " + file.getName());
-	    FileUtils.writeByteArrayToFile(file, proxyResult.body);
+	    FileUtils.writeByteArrayToFile(file, proxyResult.bodyDeflated);
 	}
     }
     
