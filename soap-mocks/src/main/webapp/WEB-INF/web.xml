@@ -2,14 +2,14 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="soap-mocks" version="3.0">
 	<listener>
         <listener-class>
-                com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+                soapmocks.ContextListener
         </listener-class>
     </listener>
     
     <servlet>
         <servlet-name>shutdown</servlet-name>
         <servlet-class>
-        	soapmocks.generic.ShutdownMock
+        	soapmocks.ShutdownServlet
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -21,7 +21,7 @@
     <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>
-        	soapmocks.generic.GenericDispatcherSoapMock
+        	soapmocks.Servlet
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>

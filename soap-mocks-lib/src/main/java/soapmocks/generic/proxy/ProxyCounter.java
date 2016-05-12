@@ -17,7 +17,7 @@ package soapmocks.generic.proxy;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-final class GenericProxyCounter {
+final class ProxyCounter {
 
     private static final AtomicLong COUNTER = new AtomicLong();
 

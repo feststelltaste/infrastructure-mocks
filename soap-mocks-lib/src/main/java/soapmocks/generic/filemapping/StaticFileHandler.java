@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import soapmocks.generic.Constants;
+import soapmocks.Constants;
 import soapmocks.generic.logging.SoapMocksLogFactory;
 import soapmocks.generic.logging.SoapMocksLogger;
 import soapmocks.io.FileUtils;
@@ -61,7 +61,7 @@ public final class StaticFileHandler {
 			throws URISyntaxException {
 		URL genericSoapDirResource = getClass().getResource(GENERIC_SOAP_DIR);
 		if (genericSoapDirResource == null) {
-		    	LOG.info("No generic soap files found.");
+		    	LOG.out("No generic soap files found.");
 			return Collections.emptyList();
 		}
 		File genericSoapDirFile = new File(genericSoapDirResource.toURI());
@@ -100,7 +100,7 @@ public final class StaticFileHandler {
 				boolean conditionMet = checkConditionMet(request, properties);
 				if (conditionMet) {
 					String responseFile = responseFile(properties);
-					LOG.info("Generic conditional ResponseFile: "
+					LOG.out("Generic conditional ResponseFile: "
 							+ responseFile);
 					return new GenericSoapResponse(getClass()
 							.getResourceAsStream(responseFile), null);
@@ -111,15 +111,15 @@ public final class StaticFileHandler {
 			if (!hasRequestContainsCondition(properties)) {
 				request = createRequestStringIfNeeded(hsr, request);
 				String responseFile = responseFile(properties);
-				LOG.info("Generic default ResponseFile: "
+				LOG.out("Generic default ResponseFile: "
 						+ responseFile);
 				return new GenericSoapResponse(getClass().getResourceAsStream(
 						responseFile), null);
 			}
 		}
-		LOG.info("No condition met and no default response found for url "
+		LOG.out("No condition met and no default response found for url "
 						+ uri);
-		LOG.info("Request was:\n"
+		LOG.out("Request was:\n"
 				+ createRequestStringIfNeeded(hsr, request));
 		return null;
 	}
@@ -157,7 +157,7 @@ public final class StaticFileHandler {
 	private void configure(String config, Properties file) {
 		String url = url(file);
 		String responseFile = responseFile(file);
-		LOG.info("#### GenericSoap Mock " + config + "\n#### " + url
+		LOG.outNoId("#### GenericSoap Mock " + config + "\n#### " + url
 				+ "\n#### " + responseFile + "\n");
 		String completeUrl = Constants.SOAP_MOCKS_CONTEXT + url;
 		if (!URL_TO_FILE_MAPPING.containsKey(completeUrl)) {

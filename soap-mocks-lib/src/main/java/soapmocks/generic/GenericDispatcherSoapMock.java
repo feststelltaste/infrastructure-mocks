@@ -29,13 +29,13 @@ import soapmocks.generic.filemapping.StaticFileHandler;
 import soapmocks.generic.logging.MockPercentageLog;
 import soapmocks.generic.logging.SoapMocksLogFactory;
 import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.generic.proxy.ProxyDelegator;
 import soapmocks.generic.proxy.ProxyHandler;
 import soapmocks.generic.servlet.BackupHttpServletRequest;
 import soapmocks.generic.servlet.BackupHttpServletResponse;
 import soapmocks.io.IOUtils;
-import soapmocks.util.ProxyDelegator;
 
-public final class GenericDispatcherSoapMock extends
+public abstract class GenericDispatcherSoapMock extends
 	com.sun.xml.ws.transport.http.servlet.WSServlet {
 
     private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(GenericDispatcherSoapMock.class);
@@ -68,20 +68,20 @@ public final class GenericDispatcherSoapMock extends
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 	    throws ServletException {
 	try {
-	    ProxyDelegator.reset();
+	    ProxyDelegator.restart();
 	    doPostInternal(req, resp);
 	} catch (Throwable t) {
 	    t.printStackTrace();
 	    throw new RuntimeException(t);
 	} finally {
-	    ProxyDelegator.reset();
+	    ProxyDelegator.restart();
 	}
     }
 
     private void doGetInternal(HttpServletRequest req, HttpServletResponse resp)
 	    throws ServletException, IOException {
 	String uri = req.getRequestURI();
-	LOG.info("GET " + uri);
+	LOG.out("GET " + uri);
 	if (!staticFileHandler.containsKey(uri)) {
 	    super.doGet(req, resp);
 	} else {
@@ -96,7 +96,7 @@ public final class GenericDispatcherSoapMock extends
 	BackupHttpServletResponse resp = new BackupHttpServletResponse(
 		respOriginal);
 	String uri = req.getRequestURI();
-	LOG.info("POST " + uri);
+	LOG.out("POST " + uri);
 	if (!staticFileHandler.containsKey(uri)) {
 	    jaxWsFirstThenProxy(req, resp, uri);
 	} else {
@@ -110,12 +110,12 @@ public final class GenericDispatcherSoapMock extends
 		resp.setStatus(code);
 		send(resp, soapResponse.getResponseStream());
 		resp.commit();
-		LOG.info("Response sent (" + code + "). "
+		LOG.out("MOCKED (Generic Config) Response sent (" + code + "). "
 			+ mockPercentageLog.logMock() + "\n");
 	    } else {
 		sendFault(resp);
 		resp.commit();
-		LOG.info("Fault sent. " + mockPercentageLog.logMock()
+		LOG.out("Fault sent. " + mockPercentageLog.logMock()
 			+ " \n");
 	    }
 	}
@@ -128,15 +128,15 @@ public final class GenericDispatcherSoapMock extends
 	if (!ProxyDelegator.isDelegateToProxy()
 		&& !resp.getResponse().trim().isEmpty()) {
 	    resp.commit();
-	    LOG.info(resp.getResponse());
-	    LOG.info("### MOCKED Response sent. "
+	    LOG.out(resp.getResponse());
+	    LOG.out("MOCKED (JaxWs) Response sent. "
 		    + mockPercentageLog.logMock() + "\n");
 	} else {
 	    if (proxyHandler.isProxy(uri)) {
-		LOG.info("Using Proxy now...");
+		LOG.out("Using Proxy now...");
 		long time = proxyHandler.doPost(uri, req, resp);
 		resp.commit();
-		LOG.info("### Proxy Response sent (took " + time
+		LOG.out("Proxy Response sent (took " + time
 			+ "ms). " + mockPercentageLog.logProxy() + "\n");
 	    } else {
 		throw new RuntimeException("No mock or proxy found");

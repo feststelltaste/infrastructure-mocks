@@ -20,6 +20,20 @@
 					</sequence>
 				</complexType>
 			</element>
+			<element name="sayHello2">
+				<complexType>
+					<sequence>
+						<element name="name" type="xsd:string" />
+					</sequence>
+				</complexType>
+			</element>
+			<element name="sayHello2Response">
+				<complexType>
+					<sequence>
+						<element name="sayHello2Return" type="xsd:string" />
+					</sequence>
+				</complexType>
+			</element>
 		</schema>
 	</wsdl:types>
 
@@ -27,9 +41,17 @@
 		<wsdl:part element="impl:sayHelloResponse" name="parameters">
 		</wsdl:part>
 	</wsdl:message>
-
 	<wsdl:message name="sayHelloRequest">
 		<wsdl:part element="impl:sayHello" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:message name="sayHello2Response">
+		<wsdl:part element="impl:sayHello2Response" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="sayHello2Request">
+		<wsdl:part element="impl:sayHello2" name="parameters">
 		</wsdl:part>
 	</wsdl:message>
 
@@ -40,6 +62,13 @@
 			<wsdl:output message="impl:sayHelloResponse" name="sayHelloResponse">
 			</wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="sayHello2">
+			<wsdl:input message="impl:sayHello2Request" name="sayHello2Request">
+			</wsdl:input>
+			<wsdl:output message="impl:sayHello2Response" name="sayHello2Response">
+			</wsdl:output>
+		</wsdl:operation>
+		
 	</wsdl:portType>
 
 	<wsdl:binding name="HelloWorldSoapBinding" type="impl:HelloWorld">
@@ -47,15 +76,21 @@
 			transport="http://schemas.xmlsoap.org/soap/http" />
 		<wsdl:operation name="sayHello">
 			<wsdlsoap:operation soapAction="" />
-			
 			<wsdl:input name="sayHelloRequest">
 				<wsdlsoap:body use="literal" />
 			</wsdl:input>
-			
 			<wsdl:output name="sayHelloResponse">
 				<wsdlsoap:body use="literal" />
 			</wsdl:output>
-
+		</wsdl:operation>
+		<wsdl:operation name="sayHello2">
+			<wsdlsoap:operation soapAction="" />
+			<wsdl:input name="sayHello2Request">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="sayHello2Response">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
 

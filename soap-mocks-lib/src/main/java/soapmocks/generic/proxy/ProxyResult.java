@@ -13,17 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.services;
+package soapmocks.generic.proxy;
 
-import org.junit.Test;
+import java.util.List;
+import java.util.Map;
 
-public class TestHelloWorldService {
-
-    private HelloWorldServiceMock helloWorldServiceMock = new HelloWorldServiceMock();
-
-    @Test
-    public void assureThatHelloServiceWorks() {
-	// assertEquals("Yeaaaah Hello me",
-	// helloWorldServiceMock.sayHello("me"));
-    }
+final class ProxyResult {
+    Map<String, List<String>> header;
+    int responseCode;
+    public byte[] bodyDeflated;
+    byte[] body;
 }

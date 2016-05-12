@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.util;
+package soapmocks.generic;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -28,17 +28,19 @@ import javax.xml.transform.stream.StreamSource;
 
 import soapmocks.generic.logging.SoapMocksLogFactory;
 import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.generic.proxy.ProxyDelegator;
+import soapmocks.generic.proxy.QuietDelegateToProxyException;
 
-public final class XmlUtil {
+public final class ResponseFinder {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(XmlUtil.class);
+    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ResponseFinder.class);
     
     private String baseDir = "";
 
-    public XmlUtil() {
+    public ResponseFinder() {
     }
 
-    public XmlUtil(String baseDir) {
+    public ResponseFinder(String baseDir) {
 	if (baseDir == null) {
 	    throw new NullPointerException();
 	}
@@ -95,7 +97,7 @@ public final class XmlUtil {
 	    JAXBElement<T> jaxbElement = unmarshaller.unmarshal(xsr, classForT);
 	    xsr.close();
 	    fileInputStream.close();
-	    LOG.info("JaxWS ResponseFile: " + xmlfile);
+	    LOG.out("JaxWS ResponseFile: " + xmlfile);
 	    return jaxbElement.getValue();
 	} catch (Exception e) {
 	    ProxyDelegator.toProxy();

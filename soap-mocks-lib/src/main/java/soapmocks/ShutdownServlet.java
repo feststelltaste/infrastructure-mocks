@@ -13,10 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic;
+package soapmocks;
 
-public final class Constants {
+import soapmocks.generic.ShutdownMock;
 
-    public static final String SOAP_MOCKS_CONTEXT = "/soap-mocks";
+public class ShutdownServlet extends ShutdownMock {
+
+    private static final long serialVersionUID = 1L;
 
 }

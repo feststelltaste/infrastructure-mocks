@@ -3,7 +3,7 @@
 	version="2.0">
 
 	<endpoint name="HelloWorldMock" implementation="soapmocks.services.HelloWorldServiceMock"
-		url-pattern="/helloworldwsdl" />
+		url-pattern="/WebService/services/HelloWorld" />
 
 
 </endpoints>

@@ -13,17 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.services;
+package soapmocks;
 
-import org.junit.Test;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-public class TestHelloWorldService {
+import soapmocks.generic.GenericDispatcherSoapMock;
 
-    private HelloWorldServiceMock helloWorldServiceMock = new HelloWorldServiceMock();
+public class Servlet extends GenericDispatcherSoapMock {
 
-    @Test
-    public void assureThatHelloServiceWorks() {
-	// assertEquals("Yeaaaah Hello me",
-	// helloWorldServiceMock.sayHello("me"));
+    private static final long serialVersionUID = 1L;
+
+    public Servlet() throws IOException, URISyntaxException {
+	super();
     }
+
 }

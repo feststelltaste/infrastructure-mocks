@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import soapmocks.generic.logging.SoapMocksLogFactory;
 import soapmocks.generic.logging.SoapMocksLogger;
 
-public final class ShutdownMock extends
+public abstract class ShutdownMock extends
 	com.sun.xml.ws.transport.http.servlet.WSServlet {
 
     private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ShutdownMock.class);
@@ -44,7 +44,7 @@ public final class ShutdownMock extends
 
     private void sendResponse(String message, HttpServletResponse resp) {
 	try {
-	    LOG.info(message);
+	    LOG.out(message);
 	    resp.getOutputStream().write(message.getBytes());
 	    resp.getOutputStream().flush();
 	    resp.getOutputStream().close();

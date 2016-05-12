@@ -26,19 +26,31 @@ public final class SoapMocksLogger {
 	this.logger = Logger.getLogger(clazz);
     }
     
+    public void outNoId(String message) {
+	System.out.println(message);
+    }
+    
+    public void out(String message) {
+	System.out.println(id() + message);
+    }
+    
     public void info(String message) {
-	logger.info(message);
+	logger.info(id() + message);
     }
     
     public void debug(String message) {
-	logger.finer(message);
+	logger.finer(id() + message);
     }
     
     public void error(Throwable t, String message) {
-	logger.log(Level.SEVERE, message, t);
+	logger.log(Level.SEVERE, id() + message, t);
     }
     
     public void error(Throwable t) {
-	logger.log(Level.SEVERE, t.getMessage(), t);
+	logger.log(Level.SEVERE, id() + t.getMessage(), t);
+    }
+    
+    String id() {
+	return "[" + Thread.currentThread().getId() + "] ";
     }
 }

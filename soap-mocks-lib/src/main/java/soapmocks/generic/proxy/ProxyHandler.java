@@ -15,39 +15,17 @@ limitations under the License.
  */
 package soapmocks.generic.proxy;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.Constants;
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
-import soapmocks.io.FileUtils;
-import soapmocks.io.IOUtils;
-import soapmocks.util.ProxyDelegator;
-import soapmocks.util.ServiceIdentifier;
-
 public final class ProxyHandler {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ProxyHandler.class);
-    private static final GenericProxyCounter COUNTER = new GenericProxyCounter();
-    private static final String PROXY_FILE = "/proxy.properties";
-    private final Properties proxies = new Properties();
+    private ProxyUrl proxyUrl;
 
     public ProxyHandler() throws IOException {
-	proxies.load(getClass().getResourceAsStream(PROXY_FILE));
+	proxyUrl = new ProxyUrl();
     }
 
     /**
@@ -56,118 +34,10 @@ public final class ProxyHandler {
     public long doPost(String uri, HttpServletRequest req,
 	    HttpServletResponse resp) throws IOException {
 	ProxyDelegator.reset();
-	long count = COUNTER.incrementAndGet();
-
-	byte[] requestString = IOUtils.toByteArray(req.getInputStream());
-
-	LOG.info("REQ-" + count + ": " + new String(requestString));
-
-	long time = System.currentTimeMillis();
-	ProxyResult proxyResult = sendPost(proxyUrl(uri),
-		mapHeaderFromRequest(req), requestString);
-	time = System.currentTimeMillis() - time;
-
-	LOG.info("RESP-" + count + ": "
-		+ new String(proxyResult.body));
-
-	copyHeaderToResponse(resp, proxyResult);
-	resp.setStatus(proxyResult.responseCode);
-	IOUtils.write(proxyResult.body, resp.getOutputStream());
-	if(ProxyDelegator.hasServiceIdentifier()) {
-	    ServiceIdentifier serviceIdentifier = ProxyDelegator.getServiceIdentifier();
-	    FileUtils.writeByteArrayToFile(new File(getProxyTraceDir()+serviceIdentifier.generateFilename()), proxyResult.body);
-	}
-	return time;
+	return new ProxyPostHandler(proxyUrl).doPostInternal(uri, req, resp);
     }
-
-    private String getProxyTraceDir() {
-	return "target/proxied/";
-    }
-
     public boolean isProxy(String uri) {
-	Set<Object> keySet = proxies.keySet();
-	for (Object key : keySet) {
-	    if (uri.contains((String) key)) {
-		return true;
-	    }
-	}
-	return false;
+	return proxyUrl.isProxy(uri);
     }
 
-    private void copyHeaderToResponse(HttpServletResponse resp,
-	    ProxyResult proxyResult) {
-	for (Entry<String, List<String>> header : proxyResult.header.entrySet()) {
-	    List<String> headerEntryList = header.getValue();
-	    for (String headerEntry : headerEntryList) {
-		if (header.getKey() != null
-			&& !header.getKey().equalsIgnoreCase("null")) {
-		    resp.setHeader(header.getKey(), headerEntry);
-		}
-	    }
-	}
-    }
-
-    private Map<String, String> mapHeaderFromRequest(HttpServletRequest req) {
-	Map<String, String> headers = new HashMap<>();
-	Enumeration<String> headerNames = req.getHeaderNames();
-	while (headerNames.hasMoreElements()) {
-	    String headerName = headerNames.nextElement();
-	    String header = req.getHeader(headerName);
-	    headers.put(headerName, header);
-	}
-	return headers;
-    }
-
-    private String proxyUrl(String uri) {
-	Set<Entry<Object, Object>> entrySet = proxies.entrySet();
-	for (Entry<Object, Object> entry : entrySet) {
-	    if (uri.contains((String) entry.getKey())) {
-		String value = (String) entry.getValue();
-		value.indexOf(uri);
-		String uriPart = uri.substring(uri
-			.indexOf(Constants.SOAP_MOCKS_CONTEXT)
-			+ Constants.SOAP_MOCKS_CONTEXT.length());
-		String proxyUrl = value + uriPart;
-		LOG.info("ProxyUrl: " + proxyUrl);
-		return proxyUrl;
-	    }
-	}
-	throw new RuntimeException("Proxy URL not found");
-    }
-
-    private ProxyResult sendPost(String url, Map<String, String> reqHeader,
-	    byte[] body) {
-	try {
-	    URL obj = new URL(url);
-	    HttpURLConnection connection = (HttpURLConnection) obj
-		    .openConnection();
-	    connection.setDoOutput(true);
-	    connection.setRequestMethod("POST");
-	    for (Entry<String, String> header : reqHeader.entrySet()) {
-		connection.setRequestProperty(header.getKey(),
-			header.getValue());
-	    }
-	    OutputStream outputStream = connection.getOutputStream();
-	    IOUtils.write(body, outputStream);
-	    outputStream.flush();
-	    outputStream.close();
-	    int responseCode = connection.getResponseCode();
-
-	    byte[] response = IOUtils.toByteArray(connection.getInputStream());
-
-	    ProxyResult proxyResult = new ProxyResult();
-	    proxyResult.responseCode = responseCode;
-	    proxyResult.body = response;
-	    proxyResult.header = connection.getHeaderFields();
-	    return proxyResult;
-	} catch (Exception e) {
-	    throw new RuntimeException(e);
-	}
-    }
-
-    private static class ProxyResult {
-	int responseCode;
-	Map<String, List<String>> header;
-	byte[] body;
-    }
 }
