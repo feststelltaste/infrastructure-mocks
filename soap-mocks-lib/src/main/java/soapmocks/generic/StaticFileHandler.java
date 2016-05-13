@@ -31,12 +31,13 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+
 import soapmocks.Constants;
-import soapmocks.generic.logging.LogFactory;
 import soapmocks.generic.logging.Log;
-import soapmocks.io.FileUtils;
-import soapmocks.io.IOUtils;
-import soapmocks.io.filefilter.IOFileFilter;
+import soapmocks.generic.logging.LogFactory;
 
 final class StaticFileHandler {
 

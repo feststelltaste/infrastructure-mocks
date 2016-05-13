@@ -18,11 +18,12 @@ package soapmocks.generic.proxy;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+
 import soapmocks.Constants;
 import soapmocks.api.ProxyDelegator;
-import soapmocks.generic.logging.LogFactory;
 import soapmocks.generic.logging.Log;
-import soapmocks.io.FileUtils;
+import soapmocks.generic.logging.LogFactory;
 
 final class ProxyRecordHandler {
 

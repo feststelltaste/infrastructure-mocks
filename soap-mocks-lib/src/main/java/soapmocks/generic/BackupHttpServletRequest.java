@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import soapmocks.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 
 public final class BackupHttpServletRequest implements HttpServletRequest {
 

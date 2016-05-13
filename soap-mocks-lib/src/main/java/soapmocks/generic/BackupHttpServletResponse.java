@@ -26,8 +26,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+
 import soapmocks.api.ProxyDelegator;
-import soapmocks.io.IOUtils;
 
 public final class BackupHttpServletResponse implements HttpServletResponse {
 

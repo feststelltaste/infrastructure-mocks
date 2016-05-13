@@ -28,9 +28,10 @@ import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.logging.LogFactory;
+import org.apache.commons.io.IOUtils;
+
 import soapmocks.generic.logging.Log;
-import soapmocks.io.IOUtils;
+import soapmocks.generic.logging.LogFactory;
 
 final class ProxyPostHandler {
 

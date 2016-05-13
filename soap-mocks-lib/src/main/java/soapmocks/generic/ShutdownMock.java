@@ -21,8 +21,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.logging.LogFactory;
 import soapmocks.generic.logging.Log;
+import soapmocks.generic.logging.LogFactory;
 
 public abstract class ShutdownMock extends
 	com.sun.xml.ws.transport.http.servlet.WSServlet {
