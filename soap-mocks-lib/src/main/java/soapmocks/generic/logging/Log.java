@@ -18,11 +18,11 @@ package soapmocks.generic.logging;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class SoapMocksLogger {
+public final class Log {
 
     private final Logger logger;
 
-    SoapMocksLogger(String clazz) {
+    Log(String clazz) {
 	this.logger = Logger.getLogger(clazz);
     }
     

@@ -15,13 +15,13 @@ limitations under the License.
  */
 package soapmocks.generic.proxy;
 
-final class ProxyServiceIdentifier {
+public final class ProxyServiceIdentifier {
 
     private final String method;
     
     private final String[] parameters;
 
-    ProxyServiceIdentifier(String method, String... parameters) {
+    public ProxyServiceIdentifier(String method, String... parameters) {
 	this.method = method;
 	this.parameters = parameters;
     }

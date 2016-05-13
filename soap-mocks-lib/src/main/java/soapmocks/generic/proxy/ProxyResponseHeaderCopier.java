@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
-final class ProxyRepsonseHeaderCopier {
+final class ProxyResponseHeaderCopier {
 
     void copyHeaderToResponse(HttpServletResponse resp,
 	    ProxyResult proxyResult) {

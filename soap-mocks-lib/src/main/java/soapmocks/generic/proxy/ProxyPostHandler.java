@@ -28,13 +28,13 @@ import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.generic.logging.LogFactory;
+import soapmocks.generic.logging.Log;
 import soapmocks.io.IOUtils;
 
 final class ProxyPostHandler {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ProxyPostHandler.class);
+    private static final Log LOG = LogFactory.create(ProxyPostHandler.class);
     private static final ProxyCounter COUNTER = new ProxyCounter();
     private final ProxyUrl proxyUrl;
 
@@ -56,7 +56,7 @@ final class ProxyPostHandler {
 	LOG.out("RESP-" + count + ": "
 		+ new String(proxyResult.bodyDeflated));
 	
-	new ProxyRepsonseHeaderCopier().copyHeaderToResponse(resp, proxyResult);
+	new ProxyResponseHeaderCopier().copyHeaderToResponse(resp, proxyResult);
 	resp.setStatus(proxyResult.responseCode);
 	IOUtils.write(proxyResult.body, resp.getOutputStream());
 	new ProxyRecordHandler().handleProxyRecord(proxyResult);

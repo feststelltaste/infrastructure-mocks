@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic.servlet;
+package soapmocks.generic;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,16 +26,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.proxy.ProxyDelegator;
+import soapmocks.api.ProxyDelegator;
 import soapmocks.io.IOUtils;
 
-public class BackupHttpServletResponse implements HttpServletResponse {
+public final class BackupHttpServletResponse implements HttpServletResponse {
 
     private HttpServletResponse delegate;
     private ByteArrayOutputStream byteArrayOutputStream;
     private int statuscode;
 
-    public BackupHttpServletResponse(HttpServletResponse delegate) {
+    BackupHttpServletResponse(HttpServletResponse delegate) {
 	this.delegate = delegate;
     }
 

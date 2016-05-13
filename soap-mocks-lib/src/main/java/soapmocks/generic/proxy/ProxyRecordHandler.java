@@ -19,26 +19,36 @@ import java.io.File;
 import java.io.IOException;
 
 import soapmocks.Constants;
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.api.ProxyDelegator;
+import soapmocks.generic.logging.LogFactory;
+import soapmocks.generic.logging.Log;
 import soapmocks.io.FileUtils;
 
 final class ProxyRecordHandler {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ProxyRecordHandler.class);
-    
+    private static final Log LOG = LogFactory.create(ProxyRecordHandler.class);
+
     void handleProxyRecord(ProxyResult proxyResult) throws IOException {
-	if(ProxyDelegator.hasServiceIdentifier()) {
-	    ProxyServiceIdentifier serviceIdentifier = ProxyDelegator.getServiceIdentifier();
-	    File file = new File(getProxyTraceDir()+serviceIdentifier.generateFilename());
+	if (ProxyDelegator.hasServiceIdentifier()) {
+	    ProxyServiceIdentifier serviceIdentifier = ProxyDelegator
+		    .getServiceIdentifier();
+	    String pathname = getProxyTraceBaseDir() + getProxyTraceDir()
+		    + serviceIdentifier.generateFilename();
+	    File file = new File(pathname);
 	    LOG.out("Proxy recorded to " + file.getName());
 	    FileUtils.writeByteArrayToFile(file, proxyResult.bodyDeflated);
 	}
     }
-    
+
+    private String getProxyTraceBaseDir() {
+	String proxyRecordBaseDir = System.getProperty("basedir");
+	return proxyRecordBaseDir != null ? proxyRecordBaseDir  + "/" : "";
+    }
+
     private String getProxyTraceDir() {
-	String proxyRecordDir = System.getProperty(Constants.SOAPMOCKS_PROXYRECORD_DIR_SYSTEM_PROP);
-	if(proxyRecordDir!=null && !proxyRecordDir.isEmpty()) {
+	String proxyRecordDir = System
+		.getProperty(Constants.SOAPMOCKS_PROXYRECORD_DIR_SYSTEM_PROP);
+	if (proxyRecordDir != null && !proxyRecordDir.isEmpty()) {
 	    return proxyRecordDir;
 	}
 	return "target/proxyrecord/";

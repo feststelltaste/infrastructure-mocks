@@ -21,12 +21,12 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import soapmocks.Constants;
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.generic.logging.LogFactory;
+import soapmocks.generic.logging.Log;
 
 final class ProxyUrl {
     
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ProxyUrl.class);
+    private static final Log LOG = LogFactory.create(ProxyUrl.class);
 
     private static final String PROXY_FILE = "/proxy.properties";
     private final Properties proxies = new Properties();

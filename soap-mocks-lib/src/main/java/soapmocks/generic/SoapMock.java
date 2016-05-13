@@ -24,31 +24,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.filemapping.GenericSoapResponse;
-import soapmocks.generic.filemapping.StaticFileHandler;
-import soapmocks.generic.logging.MockPercentageLog;
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
-import soapmocks.generic.proxy.ProxyDelegator;
+import soapmocks.api.ProxyDelegator;
+import soapmocks.generic.logging.LogFactory;
+import soapmocks.generic.logging.Log;
 import soapmocks.generic.proxy.ProxyHandler;
-import soapmocks.generic.servlet.BackupHttpServletRequest;
-import soapmocks.generic.servlet.BackupHttpServletResponse;
 import soapmocks.io.IOUtils;
 
-public abstract class GenericDispatcherSoapMock extends
+public abstract class SoapMock extends
 	com.sun.xml.ws.transport.http.servlet.WSServlet {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(GenericDispatcherSoapMock.class);
-    
+    private static final Log LOG = LogFactory.create(SoapMock.class);
     private static final long serialVersionUID = 1L;
 
     private MockPercentageLog mockPercentageLog = new MockPercentageLog();
-
     private StaticFileHandler staticFileHandler;
-
     private ProxyHandler proxyHandler;
 
-    public GenericDispatcherSoapMock() throws IOException, URISyntaxException {
+    public SoapMock() throws IOException, URISyntaxException {
 	staticFileHandler = new StaticFileHandler();
 	proxyHandler = new ProxyHandler();
     }
@@ -129,7 +121,7 @@ public abstract class GenericDispatcherSoapMock extends
 		&& !resp.getResponse().trim().isEmpty()) {
 	    resp.commit();
 	    LOG.out(resp.getResponse());
-	    LOG.out("MOCKED (JaxWs) Response sent. "
+	    LOG.out("MOCKED (JaxWS) Response sent. "
 		    + mockPercentageLog.logMock() + "\n");
 	} else {
 	    if (proxyHandler.isProxy(uri)) {

@@ -13,25 +13,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic.proxy;
+package soapmocks.api;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * Used in SoapMocks internally to handle XmlUtil parts where files are not found.
+ * Used in SoapMocks to handle {@link ResponseCreator} parts where files are not found or other things go wrong.
  * Sets Proxy delegation on creation.
  */
-public final class QuietDelegateToProxyException extends RuntimeException {
+public final class ProxyDelegateQuietException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    public QuietDelegateToProxyException(Exception e) {
+    public ProxyDelegateQuietException(Exception e) {
 	super(e.getMessage());
 	ProxyDelegator.toProxy();
     }
 
-    public QuietDelegateToProxyException(String message) {
+    public ProxyDelegateQuietException(String message) {
 	super(message);
 	ProxyDelegator.toProxy();
     }

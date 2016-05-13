@@ -20,6 +20,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import soapmocks.api.ProxyDelegator;
+
 public final class ProxyHandler {
 
     private ProxyUrl proxyUrl;
@@ -36,6 +38,7 @@ public final class ProxyHandler {
 	ProxyDelegator.reset();
 	return new ProxyPostHandler(proxyUrl).doPostInternal(uri, req, resp);
     }
+    
     public boolean isProxy(String uri) {
 	return proxyUrl.isProxy(uri);
     }

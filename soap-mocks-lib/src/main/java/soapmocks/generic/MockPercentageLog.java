@@ -13,26 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic.logging;
+package soapmocks.generic;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-public final class MockPercentageLog {
+final class MockPercentageLog {
 
     private static final AtomicLong COUNTER_PROXY = new AtomicLong();
     private static final AtomicLong COUNTER_MOCK = new AtomicLong();
 
-    public String logMock() {
+    String logMock() {
 	return logPercentage(COUNTER_MOCK.incrementAndGet(),
 		COUNTER_PROXY.get());
     }
 
-    public String logProxy() {
+    String logProxy() {
 	return logPercentage(COUNTER_MOCK.get(),
 		COUNTER_PROXY.incrementAndGet());
     }
 
-    private String logPercentage(long mocks, long proxy) {
+    String logPercentage(long mocks, long proxy) {
 	double percent = proxy == 0 ? 100 : (mocks * 100) / (proxy + mocks);
 	return "Currently " + percent + "% MOCKS (Mocks: " + mocks
 		+ " <> Proxy: " + proxy + ")";

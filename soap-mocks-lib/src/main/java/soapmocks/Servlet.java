@@ -18,9 +18,9 @@ package soapmocks;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import soapmocks.generic.GenericDispatcherSoapMock;
+import soapmocks.generic.SoapMock;
 
-public class Servlet extends GenericDispatcherSoapMock {
+public class Servlet extends SoapMock {
 
     private static final long serialVersionUID = 1L;
 

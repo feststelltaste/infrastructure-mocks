@@ -13,25 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic.filemapping;
+package soapmocks.generic.logging;
 
-import java.io.InputStream;
+public final class LogFactory {
 
-public final class GenericSoapResponse {
-    	
-	public GenericSoapResponse(InputStream inputStream, String code) {
-		responseStream = inputStream;
-		responseCode = code != null ? Integer.parseInt(code) : 200;
-	}
-
-	public InputStream getResponseStream() {
-		return responseStream;
-	}
-
-	public int getResponseCode() {
-		return responseCode;
-	}
-
-	private final InputStream responseStream;
-	private final int responseCode;
+    public static Log create(String clazz) {
+	return new Log(clazz);
+    }
+    
+    public static Log create(Class<?> clazz) {
+	return new Log(clazz.getSimpleName());
+    }
 }

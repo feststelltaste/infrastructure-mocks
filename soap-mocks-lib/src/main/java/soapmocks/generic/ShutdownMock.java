@@ -21,13 +21,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
+import soapmocks.generic.logging.LogFactory;
+import soapmocks.generic.logging.Log;
 
 public abstract class ShutdownMock extends
 	com.sun.xml.ws.transport.http.servlet.WSServlet {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ShutdownMock.class);
+    private static final Log LOG = LogFactory.create(ShutdownMock.class);
     
     private static final long serialVersionUID = 1L;
 

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic.servlet;
+package soapmocks.generic;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -41,12 +41,12 @@ import javax.servlet.http.Part;
 
 import soapmocks.io.IOUtils;
 
-public class BackupHttpServletRequest implements HttpServletRequest {
+public final class BackupHttpServletRequest implements HttpServletRequest {
 
     private HttpServletRequest delegate;
     private byte[] body;
 
-    public BackupHttpServletRequest(HttpServletRequest delegate) {
+    BackupHttpServletRequest(HttpServletRequest delegate) {
 	this.delegate = delegate;
     }
 

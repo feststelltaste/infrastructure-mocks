@@ -17,8 +17,8 @@ package soapmocks.services;
 
 import javax.jws.WebService;
 
+import soapmocks.api.ProxyDelegator;
 import soapmocks.generated.helloservice.HelloWorld;
-import soapmocks.generic.proxy.ProxyDelegator;
 
 @WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld")
 public class HelloWorldServiceMock implements HelloWorld {

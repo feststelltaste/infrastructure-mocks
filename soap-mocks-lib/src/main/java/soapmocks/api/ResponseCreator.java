@@ -13,10 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks.generic;
+package soapmocks.api;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
@@ -26,21 +25,22 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
-import soapmocks.generic.logging.SoapMocksLogFactory;
-import soapmocks.generic.logging.SoapMocksLogger;
-import soapmocks.generic.proxy.ProxyDelegator;
-import soapmocks.generic.proxy.QuietDelegateToProxyException;
+import soapmocks.generic.logging.Log;
+import soapmocks.generic.logging.LogFactory;
 
-public final class ResponseFinder {
+/**
+ * An API class to create JaxWS response objects from XML files.
+ */
+public final class ResponseCreator {
 
-    private static final SoapMocksLogger LOG = SoapMocksLogFactory.create(ResponseFinder.class);
+    private static final Log LOG = LogFactory.create(ResponseCreator.class);
     
     private String baseDir = "";
 
-    public ResponseFinder() {
+    public ResponseCreator() {
     }
 
-    public ResponseFinder(String baseDir) {
+    public ResponseCreator(String baseDir) {
 	if (baseDir == null) {
 	    throw new NullPointerException();
 	}
@@ -61,10 +61,10 @@ public final class ResponseFinder {
     public <T> T unmarshal(Class<T> classForT, boolean defaultXml,
 	    String method, String... parameters) {
 	ProxyDelegator.serviceIdentifier(method, parameters);
-	String filename = findFileFromMethodsAndParameter(defaultXml, method,
+	String filename = new ResponseCreatorFileFinder().findFileFromMethodsAndParameter(baseDir, defaultXml, method,
 		parameters);
 	if (filename == null) {
-	    throw new QuietDelegateToProxyException("file not found");
+	    throw new ProxyDelegateQuietException("file not found");
 	}
 	return unmarshal(filename, classForT);
     }
@@ -101,53 +101,14 @@ public final class ResponseFinder {
 	    return jaxbElement.getValue();
 	} catch (Exception e) {
 	    ProxyDelegator.toProxy();
-	    throw new QuietDelegateToProxyException(e);
+	    throw new ProxyDelegateQuietException(e);
 	}
     }
 
     private void failIfStreamNotFound(String file, InputStream fileInputStream)
 	    throws FileNotFoundException {
 	if (fileInputStream == null) {
-	    throw new QuietDelegateToProxyException(file + " not found.");
+	    throw new ProxyDelegateQuietException(file + " not found.");
 	}
     }
-
-    private String findFileFromMethodsAndParameter(boolean defaultXml,
-	    String method, String... parameters) {
-	String filename = "/" + method;
-	for (String parameter : parameters) {
-	    filename += "-" + parameter;
-	}
-	filename += ".xml";
-	InputStream fileInputStream = getClass().getResourceAsStream(
-		baseDir + filename);
-
-	if (fileInputStream == null) {
-	    if (defaultXml) {
-		filename = "/" + method + "-default.xml";
-	    } else {
-		throw new QuietDelegateToProxyException(filename + " not found");
-	    }
-	} else {
-	    closeQuietly(fileInputStream);
-	}
-
-	fileInputStream = getClass().getResourceAsStream(baseDir + filename);
-	if (fileInputStream == null) {
-	    throw new QuietDelegateToProxyException(filename + " not found");
-	} else {
-	    closeQuietly(fileInputStream);
-	}
-
-	return filename;
-    }
-
-    private void closeQuietly(InputStream fileInputStream) {
-	try {
-	    fileInputStream.close();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-    }
-
 }
