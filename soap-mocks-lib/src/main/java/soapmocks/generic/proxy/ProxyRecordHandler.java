@@ -42,7 +42,7 @@ final class ProxyRecordHandler {
 
     private String getProxyTraceBaseDir() {
 	String proxyRecordBaseDir = System.getProperty("basedir");
-	return proxyRecordBaseDir != null ? proxyRecordBaseDir  + "/" : "";
+	return proxyRecordBaseDir != null ? proxyRecordBaseDir  + File.pathSeparator : "";
     }
 
     private String getProxyTraceDir() {
