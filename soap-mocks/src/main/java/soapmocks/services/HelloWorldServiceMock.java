@@ -20,7 +20,7 @@ import javax.jws.WebService;
 import soapmocks.api.ProxyDelegator;
 import soapmocks.generated.helloservice.HelloWorld;
 
-@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld")
+@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", name = "HelloWorldServiceMock", serviceName = "/WebService/services/HelloWorld", portName = "/WebService/services/HelloWorld")
 public class HelloWorldServiceMock implements HelloWorld {
 
     @Override

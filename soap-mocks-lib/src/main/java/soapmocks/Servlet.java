@@ -18,8 +18,11 @@ package soapmocks;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.servlet.annotation.WebServlet;
+
 import soapmocks.generic.SoapMock;
 
+@WebServlet(loadOnStartup=1, urlPatterns="/*")
 public class Servlet extends SoapMock {
 
     private static final long serialVersionUID = 1L;

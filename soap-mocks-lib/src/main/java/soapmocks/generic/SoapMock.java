@@ -18,7 +18,6 @@ package soapmocks.generic;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,13 +37,8 @@ public abstract class SoapMock extends
     private static final long serialVersionUID = 1L;
 
     private MockPercentageLog mockPercentageLog = new MockPercentageLog();
-    private StaticFileHandler staticFileHandler;
-    private ProxyHandler proxyHandler;
-
-    public SoapMock() throws IOException, URISyntaxException {
-	staticFileHandler = new StaticFileHandler();
-	proxyHandler = new ProxyHandler();
-    }
+    private StaticFileHandler staticFileHandler = new StaticFileHandler();
+    private ProxyHandler proxyHandler = new ProxyHandler();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

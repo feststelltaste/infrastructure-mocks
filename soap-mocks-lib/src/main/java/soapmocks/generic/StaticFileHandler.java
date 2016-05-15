@@ -46,12 +46,20 @@ final class StaticFileHandler {
     private static final String GENERIC_SOAP_DIR = "/generic_soap_mocks/";
     private Map<String, List<Properties>> URL_TO_FILE_MAPPING = new HashMap<String, List<Properties>>();
 
-    StaticFileHandler() throws IOException, URISyntaxException {
-	Collection<File> configFiles = findConfigFilesInGenericSoapMocks();
-	for (File configFile : configFiles) {
-	    Properties config = new Properties();
-	    config.load(new FileInputStream(configFile));
-	    configure(configFile.getName(), config);
+    StaticFileHandler() {
+	initWithRuntimeException();
+    }
+    
+    private void initWithRuntimeException() {
+	try {
+	    Collection<File> configFiles = findConfigFilesInGenericSoapMocks();
+	    for (File configFile : configFiles) {
+		Properties config = new Properties();
+		config.load(new FileInputStream(configFile));
+		configure(configFile.getName(), config);
+	    }
+	} catch(IOException | URISyntaxException e) {
+	    throw new RuntimeException(e);
 	}
     }
 

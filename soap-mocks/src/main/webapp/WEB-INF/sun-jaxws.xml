@@ -5,5 +5,4 @@
 	<endpoint name="HelloWorldMock" implementation="soapmocks.services.HelloWorldServiceMock"
 		url-pattern="/WebService/services/HelloWorld" />
 
-
 </endpoints>

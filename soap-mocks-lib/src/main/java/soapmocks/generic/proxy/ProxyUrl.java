@@ -31,8 +31,16 @@ final class ProxyUrl {
     private static final String PROXY_FILE = "/proxy.properties";
     private final Properties proxies = new Properties();
     
-    ProxyUrl() throws IOException {
-	proxies.load(getClass().getResourceAsStream(PROXY_FILE));
+    ProxyUrl() {
+	initwithRuntimeException();
+    }
+
+    private void initwithRuntimeException() {
+	try {
+	    proxies.load(getClass().getResourceAsStream(PROXY_FILE));
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
     }
 
     String proxyUrl(String uri) {

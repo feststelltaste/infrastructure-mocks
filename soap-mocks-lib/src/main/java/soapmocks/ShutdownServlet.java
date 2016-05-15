@@ -15,8 +15,11 @@ limitations under the License.
  */
 package soapmocks;
 
+import javax.servlet.annotation.WebServlet;
+
 import soapmocks.generic.ShutdownMock;
 
+@WebServlet(loadOnStartup=1, value="/shuwdown")
 public class ShutdownServlet extends ShutdownMock {
 
     private static final long serialVersionUID = 1L;

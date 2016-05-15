@@ -19,19 +19,18 @@ import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import com.sun.xml.ws.transport.http.servlet.WSServletContextListener;
 
+@WebListener
 public class ContextListener implements ServletContextListener, ServletContextAttributeListener {
 
-    private WSServletContextListener wsServletContextListener;
-
-    public ContextListener() {
-	wsServletContextListener = new WSServletContextListener();
-    }
+    private WSServletContextListener wsServletContextListener = new WSServletContextListener();
 
     @Override
     public void attributeAdded(ServletContextAttributeEvent event) {
+	System.out.println("added: "+event.getName() + ":" + event.getValue());
 	wsServletContextListener.attributeAdded(event);
     }
 
@@ -42,6 +41,7 @@ public class ContextListener implements ServletContextListener, ServletContextAt
 
     @Override
     public void attributeReplaced(ServletContextAttributeEvent event) {
+	System.out.println("replaced: "+event.getName() + ":" + event.getValue());
 	wsServletContextListener.attributeReplaced(event);
     }
 

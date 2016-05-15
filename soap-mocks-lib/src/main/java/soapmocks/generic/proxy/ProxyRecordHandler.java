@@ -33,11 +33,16 @@ final class ProxyRecordHandler {
 	if (ProxyDelegator.hasServiceIdentifier()) {
 	    ProxyServiceIdentifier serviceIdentifier = ProxyDelegator
 		    .getServiceIdentifier();
+	    String hash = new Filehasing().hash(proxyResult.bodyDeflated);
 	    String pathname = getProxyTraceBaseDir() + getProxyTraceDir()
-		    + serviceIdentifier.generateFilename();
+		    + serviceIdentifier.generateFilename(hash);
 	    File file = new File(pathname);
-	    LOG.out("Proxy recorded to " + file.getName());
-	    FileUtils.writeByteArrayToFile(file, proxyResult.bodyDeflated);
+	    if(!file.exists()) {
+		LOG.out("Proxy recorded to " + file.getName());
+		FileUtils.writeByteArrayToFile(file, proxyResult.bodyDeflated);
+	    } else {
+		LOG.out("Proxy existing record skipped: " + file.getName());
+	    }
 	}
     }
 

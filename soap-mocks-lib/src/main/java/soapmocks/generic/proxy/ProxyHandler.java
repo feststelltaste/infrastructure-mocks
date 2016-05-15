@@ -24,11 +24,7 @@ import soapmocks.api.ProxyDelegator;
 
 public final class ProxyHandler {
 
-    private ProxyUrl proxyUrl;
-
-    public ProxyHandler() throws IOException {
-	proxyUrl = new ProxyUrl();
-    }
+    private ProxyUrl proxyUrl = new ProxyUrl();
 
     /**
      * @return Time in millis that the proxy call took
