@@ -15,27 +15,15 @@ limitations under the License.
  */
 package soapmocks.generic;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 
-import soapmocks.Constants;
 import soapmocks.generic.logging.Log;
 import soapmocks.generic.logging.LogFactory;
 
@@ -43,91 +31,10 @@ final class StaticFileHandler {
 
     private static final Log LOG = LogFactory
 	    .create(StaticFileHandler.class);
-    private static final String GENERIC_SOAP_DIR = "/generic_soap_mocks/";
-    private Map<String, List<Properties>> URL_TO_FILE_MAPPING = new HashMap<String, List<Properties>>();
-
-    StaticFileHandler() {
-	initWithRuntimeException();
-    }
     
-    private void initWithRuntimeException() {
-	try {
-	    Collection<File> configFiles = findConfigFilesInGenericSoapMocks();
-	    for (File configFile : configFiles) {
-		Properties config = new Properties();
-		config.load(new FileInputStream(configFile));
-		configure(configFile.getName(), config);
-	    }
-	} catch(IOException | URISyntaxException e) {
-	    throw new RuntimeException(e);
-	}
-    }
 
     boolean containsKey(String uri) {
-	return URL_TO_FILE_MAPPING.containsKey(uri);
-    }
-
-    private Collection<File> findConfigFilesInGenericSoapMocks()
-	    throws URISyntaxException {
-	URL genericSoapDirResource = getClass().getResource(GENERIC_SOAP_DIR);
-	if (genericSoapDirResource == null) {
-	    LOG.out("No generic soap files found.");
-	    return Collections.emptyList();
-	}
-	File genericSoapDirFile = new File(genericSoapDirResource.toURI());
-	Collection<File> urlFiles = FileUtils.listFiles(genericSoapDirFile,
-		new IOFileFilter() {
-		    @Override
-		    public boolean accept(File arg0, String arg1) {
-			return arg0.getName().endsWith(".config");
-		    }
-
-		    @Override
-		    public boolean accept(File arg0) {
-			return arg0.getName().endsWith(".config");
-		    }
-		}, new IOFileFilter() {
-		    @Override
-		    public boolean accept(File arg0, String arg1) {
-			return true;
-		    }
-
-		    @Override
-		    public boolean accept(File arg0) {
-			return true;
-		    }
-		});
-	return urlFiles;
-    }
-
-    GenericSoapResponse findResponseByPropertiesAndRequest(
-	    HttpServletRequest hsr, String uri) throws IOException {
-	List<Properties> propertiesList = URL_TO_FILE_MAPPING.get(uri);
-	String request = null;
-	for (Properties properties : propertiesList) {
-	    if (hasAnyRequestCondition(properties)) {
-		request = createRequestStringIfNeeded(hsr, request);
-		boolean conditionMet = checkConditionMet(request, properties);
-		if (conditionMet) {
-		    String responseFile = responseFile(properties);
-		    LOG.out("Generic conditional ResponseFile: " + responseFile);
-		    return new GenericSoapResponse(getClass()
-			    .getResourceAsStream(responseFile), null);
-		}
-	    }
-	}
-	for (Properties properties : propertiesList) {
-	    if (!hasRequestContainsCondition(properties)) {
-		request = createRequestStringIfNeeded(hsr, request);
-		String responseFile = responseFile(properties);
-		LOG.out("Generic default ResponseFile: " + responseFile);
-		return new GenericSoapResponse(getClass().getResourceAsStream(
-			responseFile), null);
-	    }
-	}
-	LOG.out("No condition met and no default response found for url " + uri);
-	LOG.out("Request was:\n" + createRequestStringIfNeeded(hsr, request));
-	return null;
+	return StaticFileConfig.URL_TO_FILE_MAPPING.containsKey(uri);
     }
 
     private String createRequestStringIfNeeded(HttpServletRequest hsr,
@@ -160,26 +67,38 @@ final class StaticFileHandler {
 	return conditionMet;
     }
 
-    private void configure(String config, Properties file) {
-	String url = url(file);
-	String responseFile = responseFile(file);
-	LOG.outNoId("#### GenericSoap Mock " + config + "\n#### " + url
-		+ "\n#### " + responseFile + "\n");
-	String completeUrl = Constants.SOAP_MOCKS_CONTEXT + url;
-	if (!URL_TO_FILE_MAPPING.containsKey(completeUrl)) {
-	    List<Properties> properties = new ArrayList<Properties>();
-	    URL_TO_FILE_MAPPING.put(completeUrl, properties);
+
+    GenericSoapResponse findResponseByPropertiesAndRequest(
+	    HttpServletRequest hsr, String uri) throws IOException {
+	List<Properties> propertiesList = StaticFileConfig.URL_TO_FILE_MAPPING.get(uri);
+	String request = null;
+	for (Properties properties : propertiesList) {
+	    if (hasAnyRequestCondition(properties)) {
+		request = createRequestStringIfNeeded(hsr, request);
+		boolean conditionMet = checkConditionMet(request, properties);
+		if (conditionMet) {
+		    String responseFile = StaticFileConfig.responseFile(properties);
+		    LOG.out("Generic conditional ResponseFile: " + responseFile);
+		    return new GenericSoapResponse(getClass()
+			    .getResourceAsStream(responseFile), null);
+		}
+	    }
 	}
-	URL_TO_FILE_MAPPING.get(completeUrl).add(file);
+	for (Properties properties : propertiesList) {
+	    if (!hasRequestContainsCondition(properties)) {
+		request = createRequestStringIfNeeded(hsr, request);
+		String responseFile = StaticFileConfig.responseFile(properties);
+		LOG.out("Generic default ResponseFile: " + responseFile);
+		return new GenericSoapResponse(getClass().getResourceAsStream(
+			responseFile), null);
+	    }
+	}
+	LOG.out("No condition met and no default response found for url " + uri);
+	LOG.out("Request was:\n" + createRequestStringIfNeeded(hsr, request));
+	return null;
     }
 
-    private String responseFile(Properties file) {
-	return GENERIC_SOAP_DIR + file.getProperty("responseFile");
-    }
 
-    private String url(Properties file) {
-	return file.getProperty("url");
-    }
 
     private String[] requestContainsCondition(Properties file) {
 	return file.getProperty("requestContains").split(" ");

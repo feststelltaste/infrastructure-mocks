@@ -15,45 +15,14 @@ limitations under the License.
  */
 package soapmocks;
 
-import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
-import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import com.sun.xml.ws.transport.http.servlet.WSServletContextListener;
+import soapmocks.generic.listener.WsServletContextListener;
 
 @WebListener
-public class ContextListener implements ServletContextListener, ServletContextAttributeListener {
+public class ContextListener extends WsServletContextListener implements ServletContextListener, ServletContextAttributeListener {
 
-    private WSServletContextListener wsServletContextListener = new WSServletContextListener();
-
-    @Override
-    public void attributeAdded(ServletContextAttributeEvent event) {
-	System.out.println("added: "+event.getName() + ":" + event.getValue());
-	wsServletContextListener.attributeAdded(event);
-    }
-
-    @Override
-    public void attributeRemoved(ServletContextAttributeEvent event) {
-	wsServletContextListener.attributeRemoved(event);
-    }
-
-    @Override
-    public void attributeReplaced(ServletContextAttributeEvent event) {
-	System.out.println("replaced: "+event.getName() + ":" + event.getValue());
-	wsServletContextListener.attributeReplaced(event);
-    }
-
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-	wsServletContextListener.contextInitialized(sce);
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-	wsServletContextListener.contextDestroyed(sce);
-    }
-    
 }
 

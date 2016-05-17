@@ -13,15 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks;
+package soapmocks.api;
 
-import javax.servlet.annotation.WebServlet;
+import static java.lang.annotation.ElementType.TYPE;
 
-import soapmocks.generic.ShutdownMock;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@WebServlet(loadOnStartup=1, value="/shutdown")
-public class ShutdownServlet extends ShutdownMock {
-
-    private static final long serialVersionUID = 1L;
+/**
+ * Annotation that defines the service URL. Example: <p>
+ * <p>
+ * {@link SoapMockUrl}("/Webservice/Test") <p>
+ * <p>
+ * This will make the service available under http://host:port/soap-mocks/Webservice/Test<p>
+ * <p>
+ */
+@Retention(value=RetentionPolicy.RUNTIME)
+@Target({TYPE})
+public @interface SoapMockUrl {
+    
+    String value() default "NONE";
 
 }

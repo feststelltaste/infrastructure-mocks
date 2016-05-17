@@ -18,14 +18,17 @@ package soapmocks.services;
 import javax.jws.WebService;
 
 import soapmocks.api.ProxyDelegator;
+import soapmocks.api.SoapMockUrl;
 import soapmocks.generated.helloservice.HelloWorld;
 
 @WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", name = "HelloWorldServiceMock", serviceName = "/WebService/services/HelloWorld", portName = "/WebService/services/HelloWorld")
+@SoapMockUrl(value = "/WebService/services/HelloWorld")
 public class HelloWorldServiceMock implements HelloWorld {
 
     @Override
     public String sayHello(String name) {
 	ProxyDelegator.toProxy("sayHello", name);
+	System.out.println("YEEAH");
 	return null;
     }
 
