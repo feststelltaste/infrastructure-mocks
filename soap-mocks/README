@@ -54,9 +54,7 @@ Add SOAP Mocks
 			</configuration>
 		</execution>
 		
-	3. implement PortType (see e.g. SomeServicePortType)
-	
-	4. Register endpoint for porttype in src/main/webapp/WEB-INF/sun-jaxws.xml
+	3. implement PortType (see example HelloWorldServiceMock) using @SoapMocksUrl annotation
 	
 
 License
