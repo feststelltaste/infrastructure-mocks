@@ -40,6 +40,11 @@ public final class ResponseCreator {
     public ResponseCreator() {
     }
 
+    /**
+     * @param baseDir
+     *            for finding the files to be found. Relative to
+     *            soapmocks.files.basedir or classpath
+     */
     public ResponseCreator(String baseDir) {
 	if (baseDir == null) {
 	    throw new NullPointerException();
@@ -48,26 +53,80 @@ public final class ResponseCreator {
     }
 
     /**
-     * With searching for defaultXml true. Supports Service Identifier.
+     * Create the response object using all information given. If nothing was
+     * found for method and parameter, it will try to find a default file. If
+     * this fails, proxy delegation jumps in if configured. As element for
+     * response the classname of classForT starting with lower case will be
+     * taken.
+     * <p>
+     * <p>
+     * Supports Service Identifier, so when proxy delegation jumps in, it will
+     * be able to create a record.
+     * <p>
+     * 
+     * @param classForT
+     *            The type of the response object
+     * @param method
+     *            the method of the webservice
+     * @param parameters
+     *            any parameter string from request to indentify it
+     * @return Object to return in WebService
      */
-    public <T> T unmarshal(Class<T> classForT, String method,
-	    String... parameters) {
-	return unmarshal(null, classForT, true, method, parameters);
+    public <T> T using(Class<T> classForT, String method, String... parameters) {
+	return using(null, classForT, true, method, parameters);
     }
 
     /**
-     * With searching for defaultXml true, with element of response. Supports
-     * Service Identifier.
+     * Create the response object using all information given. If nothing was
+     * found for method and parameter, it will try to find a default file. If
+     * this fails, proxy delegation jumps in if configured.
+     * <p>
+     * <p>
+     * Supports Service Identifier, so when proxy delegation jumps in, it will
+     * be able to create a record.
+     * <p>
+     * 
+     * @param elementResponse
+     *            The element in the response file representing the response
+     *            object
+     * @param classForT
+     *            The type of the response object
+     * @param method
+     *            the method of the webservice
+     * @param parameters
+     *            any parameter string from request to indentify it
+     * @return Object to return in WebService
      */
-    public <T> T unmarshal(String elementResponse, Class<T> classForT,
+    public <T> T using(String elementResponse, Class<T> classForT,
 	    String method, String... parameters) {
-	return unmarshal(elementResponse, classForT, true, method, parameters);
+	return using(elementResponse, classForT, true, method, parameters);
     }
 
     /**
-     * Supports Service Identifier.
+     * Create the response object using all information given. If nothing was
+     * found for method and parameter, it will try to find a default file, when
+     * defaultXml is true. If this fails, proxy delegation jumps in if
+     * configured.
+     * <p>
+     * <p>
+     * Supports Service Identifier, so when proxy delegation jumps in, it will
+     * be able to create a record.
+     * <p>
+     * 
+     * @param elementResponse
+     *            The element in the response file representing the response
+     *            object
+     * @param classForT
+     *            The type of the response object
+     * @param defaultXml
+     *            true when a default xml shall be searched for
+     * @param method
+     *            the method of the webservice
+     * @param parameters
+     *            any parameter string from request to indentify it
+     * @return Object to return in WebService
      */
-    public <T> T unmarshal(String elementResponse, Class<T> classForT,
+    public <T> T using(String elementResponse, Class<T> classForT,
 	    boolean defaultXml, String method, String... parameters) {
 	ProxyDelegator.serviceIdentifier(method, parameters);
 	String filename = new ResponseCreatorFileFinder()
@@ -76,16 +135,14 @@ public final class ResponseCreator {
 	if (filename == null) {
 	    throw new ProxyDelegateQuietException("file not found");
 	}
-	return unmarshal(filename, elementResponse, classForT);
+	return using(filename, elementResponse, classForT);
     }
 
-    public <T> T unmarshal(String xmlfile, Class<T> classForT) {
-
-	return unmarshal(xmlfile, null, classForT);
+    public <T> T using(String xmlfile, Class<T> classForT) {
+	return using(xmlfile, null, classForT);
     }
 
-    public <T> T unmarshal(String xmlfile, String fromElement,
-	    Class<T> classForT) {
+    public <T> T using(String xmlfile, String fromElement, Class<T> classForT) {
 	if (fromElement == null) {
 	    String simpleName = classForT.getSimpleName();
 	    fromElement = Character.toLowerCase(simpleName.charAt(0))
@@ -108,8 +165,9 @@ public final class ResponseCreator {
 		    break;
 		}
 	    }
-	    if(!found) {
-		throw new ProxyDelegateQuietException(fromElement + " element not found in " + xmlfile);
+	    if (!found) {
+		throw new ProxyDelegateQuietException(fromElement
+			+ " element not found in " + xmlfile);
 	    }
 	    JAXBContext jc;
 	    jc = JAXBContext.newInstance(classForT);
