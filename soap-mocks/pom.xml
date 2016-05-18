@@ -44,8 +44,11 @@
 				<configuration>
 					<port>${mock.port}</port>
 					<systemProperties>
-						<CATALINA_OPTS>-Djava.awt.headless=true -Dfile.encoding=UTF-8
+						<CATALINA_OPTS>
+						-Djava.awt.headless=true -Dfile.encoding=UTF-8
 						</CATALINA_OPTS>
+						<soapmocks.files.basedir>${basedir}/conf</soapmocks.files.basedir>
+						<soapmocks.proxyrecord.dir>${basedir}/target/proxyrecords</soapmocks.proxyrecord.dir>
 					</systemProperties>
 				</configuration>
 			</plugin>

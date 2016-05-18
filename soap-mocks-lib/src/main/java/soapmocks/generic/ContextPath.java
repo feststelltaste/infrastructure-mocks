@@ -13,12 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package soapmocks;
+package soapmocks.generic;
 
-public final class Constants {
+public class ContextPath {
 
-    public static final String SOAP_MOCKS_CONTEXT = "/soap-mocks";
-
-    public static final String SOAPMOCKS_PROXYRECORD_DIR_SYSTEM_PROP = "soapmocks.proxyrecord.dir";
-
+    public static String SOAP_MOCKS_CONTEXT = "";  
+    
 }

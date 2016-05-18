@@ -34,15 +34,23 @@ public final class ProxyServiceIdentifier {
 	return method;
     }
     
+    String generateFilename() {
+	return generateFilename(null);
+    }
+    
     String generateFilename(String hash) {
 	StringBuilder filename = new StringBuilder();
 	filename.append(method);
 	for (String parameter : parameters) {
 	    filename.append("-").append(parameter);
 	}
+	addHashIfNotNull(hash, filename);
+	return filename.append(".xml").toString();
+    }
+
+    private void addHashIfNotNull(String hash, StringBuilder filename) {
 	if(hash!=null) {
 	    filename.append(".resp-" + hash);
 	}
-	return filename.append(".xml").toString();
     }
 }

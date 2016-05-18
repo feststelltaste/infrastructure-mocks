@@ -34,7 +34,7 @@ import soapmocks.generic.logging.LogFactory;
 public final class ResponseCreator {
 
     private static final Log LOG = LogFactory.create(ResponseCreator.class);
-    
+
     private String baseDir = "";
 
     public ResponseCreator() {
@@ -52,44 +52,64 @@ public final class ResponseCreator {
      */
     public <T> T unmarshal(Class<T> classForT, String method,
 	    String... parameters) {
-	return unmarshal(classForT, true, method, parameters);
+	return unmarshal(null, classForT, true, method, parameters);
+    }
+
+    /**
+     * With searching for defaultXml true, with element of response. Supports
+     * Service Identifier.
+     */
+    public <T> T unmarshal(String elementResponse, Class<T> classForT,
+	    String method, String... parameters) {
+	return unmarshal(elementResponse, classForT, true, method, parameters);
     }
 
     /**
      * Supports Service Identifier.
      */
-    public <T> T unmarshal(Class<T> classForT, boolean defaultXml,
-	    String method, String... parameters) {
+    public <T> T unmarshal(String elementResponse, Class<T> classForT,
+	    boolean defaultXml, String method, String... parameters) {
 	ProxyDelegator.serviceIdentifier(method, parameters);
-	String filename = new ResponseCreatorFileFinder().findFileFromMethodsAndParameter(baseDir, defaultXml, method,
-		parameters);
+	String filename = new ResponseCreatorFileFinder()
+		.findFileFromMethodsAndParameter(baseDir, defaultXml, method,
+			parameters);
 	if (filename == null) {
 	    throw new ProxyDelegateQuietException("file not found");
 	}
-	return unmarshal(filename, classForT);
+	return unmarshal(filename, elementResponse, classForT);
     }
 
     public <T> T unmarshal(String xmlfile, Class<T> classForT) {
-	String simpleName = classForT.getSimpleName();
-	String fromElement = Character.toLowerCase(simpleName.charAt(0))
-		+ (simpleName.length() > 1 ? simpleName.substring(1) : "");
-	return unmarshal(xmlfile, fromElement, classForT);
+
+	return unmarshal(xmlfile, null, classForT);
     }
 
     public <T> T unmarshal(String xmlfile, String fromElement,
 	    Class<T> classForT) {
+	if (fromElement == null) {
+	    String simpleName = classForT.getSimpleName();
+	    fromElement = Character.toLowerCase(simpleName.charAt(0))
+		    + (simpleName.length() > 1 ? simpleName.substring(1) : "");
+	}
 	try {
 	    xmlfile = baseDir + xmlfile;
 	    XMLInputFactory xif = XMLInputFactory.newInstance();
-	    InputStream fileInputStream = getClass().getResourceAsStream(
-		    xmlfile);
+	    InputStream fileInputStream = new ResponseCreatorFileFinder()
+		    .getFile(xmlfile);
 	    failIfStreamNotFound(xmlfile, fileInputStream);
 	    StreamSource xml = new StreamSource(fileInputStream);
 	    XMLStreamReader xsr = xif.createXMLStreamReader(xml);
-	    xsr.next();
-	    while (xsr.getLocalName() == null
-		    || !xsr.getLocalName().equals(fromElement)) {
+	    boolean found = false;
+	    while (xsr.hasNext()) {
 		xsr.next();
+		if (xsr.isStartElement()
+			&& xsr.getLocalName().equals(fromElement)) {
+		    found = true;
+		    break;
+		}
+	    }
+	    if(!found) {
+		throw new ProxyDelegateQuietException(fromElement + " element not found in " + xmlfile);
 	    }
 	    JAXBContext jc;
 	    jc = JAXBContext.newInstance(classForT);
@@ -100,6 +120,7 @@ public final class ResponseCreator {
 	    LOG.out("JaxWS ResponseFile: " + xmlfile);
 	    return jaxbElement.getValue();
 	} catch (Exception e) {
+	    e.printStackTrace();
 	    ProxyDelegator.toProxy();
 	    throw new ProxyDelegateQuietException(e);
 	}

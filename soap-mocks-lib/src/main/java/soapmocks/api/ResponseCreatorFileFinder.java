@@ -15,6 +15,8 @@ limitations under the License.
  */
 package soapmocks.api;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,8 +29,7 @@ final class ResponseCreatorFileFinder {
 	    filename += "-" + parameter;
 	}
 	filename += ".xml";
-	InputStream fileInputStream = getClass().getResourceAsStream(
-		basedir + filename);
+	InputStream fileInputStream = getFile(basedir + filename);
 
 	if (fileInputStream == null) {
 	    if (defaultXml) {
@@ -40,10 +41,23 @@ final class ResponseCreatorFileFinder {
 	    closeQuietly(fileInputStream);
 	}
 
-	fileInputStream = getClass().getResourceAsStream(basedir + filename);
+	fileInputStream = getFile(basedir + filename);
 	closeFileOrFailIfNotFound(filename, fileInputStream);
 
 	return filename;
+    }
+
+    InputStream getFile(String filename) {
+	String basedir = System.getProperty(Constants.SOAPMOCKS_FILES_BASEDIR_SYSTEM_PROP);
+	if(basedir!=null) {
+	    try {
+		return new FileInputStream(basedir + filename);
+	    } catch (FileNotFoundException e) {
+		System.out.println(e.getMessage());
+		return null;
+	    }
+	}
+	return getClass().getResourceAsStream(filename);
     }
 
     private void closeFileOrFailIfNotFound(String filename, InputStream fileInputStream) {

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
-import soapmocks.Constants;
+import soapmocks.api.Constants;
 import soapmocks.api.ProxyDelegator;
 import soapmocks.generic.logging.Log;
 import soapmocks.generic.logging.LogFactory;
@@ -33,30 +33,50 @@ final class ProxyRecordHandler {
 	if (ProxyDelegator.hasServiceIdentifier()) {
 	    ProxyServiceIdentifier serviceIdentifier = ProxyDelegator
 		    .getServiceIdentifier();
-	    String hash = new Filehasing().hash(proxyResult.bodyDeflated);
-	    String pathname = getProxyTraceBaseDir() + getProxyTraceDir()
-		    + serviceIdentifier.generateFilename(hash);
-	    File file = new File(pathname);
-	    if(!file.exists()) {
-		LOG.out("Proxy recorded to " + file.getName());
-		FileUtils.writeByteArrayToFile(file, proxyResult.bodyDeflated);
-	    } else {
-		LOG.out("Proxy existing record skipped: " + file.getName());
-	    }
+	    addSimpleFile(proxyResult, serviceIdentifier);
+	    addHashedFile(proxyResult, serviceIdentifier);
+	}
+    }
+
+    private void addSimpleFile(ProxyResult proxyResult,
+	    ProxyServiceIdentifier serviceIdentifier) throws IOException {
+	String pathnameSimple = getProxyTraceBaseDir() + getProxyTraceDir()
+		+ serviceIdentifier.generateFilename();
+	File fileSimple = new File(pathnameSimple);
+	if (!fileSimple.exists()) {
+	    LOG.out("Proxy recorded to first " + fileSimple.getName());
+	    FileUtils
+		    .writeByteArrayToFile(fileSimple, proxyResult.bodyDeflated);
+	}
+    }
+
+    private void addHashedFile(ProxyResult proxyResult,
+	    ProxyServiceIdentifier serviceIdentifier) throws IOException {
+	String hash = new Filehasing().hash(proxyResult.bodyDeflated);
+	String pathnameWithHash = getProxyTraceBaseDir() + getProxyTraceDir()
+		+ serviceIdentifier.generateFilename(hash);
+	File fileWithHash = new File(pathnameWithHash);
+	if (!fileWithHash.exists()) {
+	    LOG.out("Proxy recorded to hashed " + fileWithHash.getName());
+	    FileUtils.writeByteArrayToFile(fileWithHash,
+		    proxyResult.bodyDeflated);
+	} else {
+	    LOG.out("Proxy existing record skipped: " + fileWithHash.getName());
 	}
     }
 
     private String getProxyTraceBaseDir() {
 	String proxyRecordBaseDir = System.getProperty("basedir");
-	return proxyRecordBaseDir != null ? proxyRecordBaseDir  + File.pathSeparator : "";
+	return proxyRecordBaseDir != null ? proxyRecordBaseDir
+		+ File.separatorChar : "";
     }
 
     private String getProxyTraceDir() {
 	String proxyRecordDir = System
 		.getProperty(Constants.SOAPMOCKS_PROXYRECORD_DIR_SYSTEM_PROP);
 	if (proxyRecordDir != null && !proxyRecordDir.isEmpty()) {
-	    return proxyRecordDir;
+	    return proxyRecordDir + File.separatorChar;
 	}
-	return "target/proxyrecord/";
+	return "target" + File.separatorChar + "proxyrecord" + File.separatorChar;
     }
 }

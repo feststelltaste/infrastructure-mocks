@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hel="http://helloworld.soapmocks">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hel:sayHelloResponse>
+         <hel:sayHelloReturn>yoya2</hel:sayHelloReturn>
+      </hel:sayHelloResponse>
+   </soapenv:Body>
+</soapenv:Envelope>

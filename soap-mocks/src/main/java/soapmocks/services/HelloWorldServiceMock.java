@@ -17,7 +17,7 @@ package soapmocks.services;
 
 import javax.jws.WebService;
 
-import soapmocks.api.ProxyDelegator;
+import soapmocks.api.ResponseCreator;
 import soapmocks.api.SoapMockUrl;
 import soapmocks.generated.helloservice.HelloWorld;
 
@@ -25,11 +25,13 @@ import soapmocks.generated.helloservice.HelloWorld;
 @SoapMockUrl(value = "/WebService/services/HelloWorld")
 public class HelloWorldServiceMock implements HelloWorld {
 
+    ResponseCreator responseCreator = new ResponseCreator("/jaxws");
+
     @Override
     public String sayHello(String name) {
-	ProxyDelegator.toProxy("sayHello", name);
-	System.out.println("YEEAH");
-	return null;
+	String result = responseCreator.unmarshal("sayHelloReturn",
+		String.class, "sayHello", name);
+	return result;
     }
 
     @Override

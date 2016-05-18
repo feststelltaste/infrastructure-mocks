@@ -15,14 +15,16 @@ limitations under the License.
  */
 package soapmocks.generic.proxy;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import soapmocks.Constants;
-import soapmocks.generic.logging.LogFactory;
+import soapmocks.api.Constants;
+import soapmocks.generic.ContextPath;
 import soapmocks.generic.logging.Log;
+import soapmocks.generic.logging.LogFactory;
 
 final class ProxyUrl {
     
@@ -37,7 +39,12 @@ final class ProxyUrl {
 
     private void initwithRuntimeException() {
 	try {
-	    proxies.load(getClass().getResourceAsStream(PROXY_FILE));
+	    String baseDir = System.getProperty(Constants.SOAPMOCKS_FILES_BASEDIR_SYSTEM_PROP);
+	    if(baseDir==null) {
+		proxies.load(getClass().getResourceAsStream(PROXY_FILE));
+	    } else {
+		proxies.load(new FileInputStream(baseDir+ PROXY_FILE));
+	    }
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -67,8 +74,8 @@ final class ProxyUrl {
     private String extractProxyUri(String uri, String key) {
 	key.indexOf(uri);
 	String uriPart = uri.substring(uri
-		.indexOf(Constants.SOAP_MOCKS_CONTEXT)
-		+ Constants.SOAP_MOCKS_CONTEXT.length());
+		.indexOf(ContextPath.SOAP_MOCKS_CONTEXT)
+		+ ContextPath.SOAP_MOCKS_CONTEXT.length());
 	String proxyUrl = proxies.getProperty(key) + uriPart;
 	LOG.out("ProxyUrl: " + proxyUrl);
 	return proxyUrl;

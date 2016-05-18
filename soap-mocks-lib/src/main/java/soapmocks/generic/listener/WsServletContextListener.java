@@ -25,6 +25,7 @@ import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import soapmocks.generic.ContextPath;
 import soapmocks.generic.StaticFileConfig;
 import soapmocks.generic.logging.Log;
 import soapmocks.generic.logging.LogFactory;
@@ -60,6 +61,10 @@ public class WsServletContextListener implements ServletContextListener,
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 	ServletContext context = sce.getServletContext();
+	
+	ContextPath.SOAP_MOCKS_CONTEXT = sce.getServletContext().getContextPath();
+	LOG.outNoId("SoapMocks context " + ContextPath.SOAP_MOCKS_CONTEXT);
+	
 	try {
 	    parseAdaptersAndCreateDelegate(context);
 	} catch (MalformedURLException e) {
@@ -72,7 +77,7 @@ public class WsServletContextListener implements ServletContextListener,
 	if (wsServletDelegate != null) {
 	    wsServletDelegate.destroy();
 	}
-	LOG.info("SoapMocks stopped");
+	LOG.outNoId("SoapMocks stopped");
     }
 
     void parseAdaptersAndCreateDelegate(ServletContext context)

@@ -31,18 +31,17 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 
-import soapmocks.Constants;
+import soapmocks.api.Constants;
 import soapmocks.generic.logging.Log;
 import soapmocks.generic.logging.LogFactory;
 
 public final class StaticFileConfig {
 
-    private static final Log LOG = LogFactory
-	    .create(StaticFileConfig.class);
-    
-    private static final String GENERIC_SOAP_DIR = "/generic_soap_mocks/";
-    
+    private static final Log LOG = LogFactory.create(StaticFileConfig.class);
+
     static final Map<String, List<Properties>> URL_TO_FILE_MAPPING = new HashMap<String, List<Properties>>();
+
+    private static final String GENERIC_SOAP_DIR = File.separatorChar + "static-files";
 
     public static void initWithRuntimeException() {
 	try {
@@ -52,19 +51,23 @@ public final class StaticFileConfig {
 		config.load(new FileInputStream(configFile));
 		configure(configFile.getName(), config);
 	    }
-	} catch(IOException | URISyntaxException e) {
+	} catch (IOException | URISyntaxException e) {
 	    throw new RuntimeException(e);
 	}
     }
 
     private static Collection<File> findConfigFilesInGenericSoapMocks()
 	    throws URISyntaxException {
-	URL genericSoapDirResource = StaticFileConfig.class.getResource(GENERIC_SOAP_DIR);
-	if (genericSoapDirResource == null) {
-	    LOG.out("No generic soap files found.");
-	    return Collections.emptyList();
+	String staticFilesDir = filesBaseDir();
+	if (staticFilesDir == null) {
+	    URL genericSoapDirResource = StaticFileConfig.class
+		    .getResource(GENERIC_SOAP_DIR);
+	    if (genericSoapDirResource == null) {
+		LOG.out("No generic soap files found.");
+		return Collections.emptyList();
+	    }
 	}
-	File genericSoapDirFile = new File(genericSoapDirResource.toURI());
+	File genericSoapDirFile = new File(staticFilesDir);
 	Collection<File> urlFiles = FileUtils.listFiles(genericSoapDirFile,
 		new IOFileFilter() {
 		    @Override
@@ -87,15 +90,25 @@ public final class StaticFileConfig {
 			return true;
 		    }
 		});
+	if (urlFiles == null || urlFiles.isEmpty()) {
+	    LOG.out("No generic soap files found.");
+	    return Collections.emptyList();
+	}
 	return urlFiles;
+    }
+
+    private static String filesBaseDir() {
+	String filesBaseDir = System
+		.getProperty(Constants.SOAPMOCKS_FILES_BASEDIR_SYSTEM_PROP);
+	return filesBaseDir;
     }
 
     private static void configure(String config, Properties file) {
 	String url = url(file);
 	String responseFile = responseFile(file);
 	LOG.outNoId("#### Static file mock " + config + " with url " + url
-		+ " and resp-file " + responseFile + "\n");
-	String completeUrl = Constants.SOAP_MOCKS_CONTEXT + url;
+		+ " and resp-file " + new File(responseFile).getName() + "\n");
+	String completeUrl = ContextPath.SOAP_MOCKS_CONTEXT + url;
 	if (!URL_TO_FILE_MAPPING.containsKey(completeUrl)) {
 	    List<Properties> properties = new ArrayList<Properties>();
 	    URL_TO_FILE_MAPPING.put(completeUrl, properties);
@@ -104,9 +117,9 @@ public final class StaticFileConfig {
     }
 
     static String responseFile(Properties file) {
-	return GENERIC_SOAP_DIR + file.getProperty("responseFile");
+	return filesBaseDir() + file.getProperty("responseFile");
     }
-    
+
     private static String url(Properties file) {
 	return file.getProperty("url");
     }
