@@ -29,7 +29,7 @@ public class HelloWorldServiceMock implements HelloWorld {
 
     @Override
     public String sayHello(String name) {
-	String result = responseCreator.unmarshal("sayHelloReturn",
+	String result = responseCreator.using("sayHelloReturn",
 		String.class, "sayHello", name);
 	return result;
     }
