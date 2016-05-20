@@ -31,21 +31,24 @@ import soapmocks.generic.logging.LogFactory;
 /**
  * An API class to create JaxWS response objects from XML files.
  */
-public final class ResponseCreator {
+public final class Response {
 
-    private static final Log LOG = LogFactory.create(ResponseCreator.class);
+    private static final Log LOG = LogFactory.create(Response.class);
 
     private String baseDir = "";
 
-    public ResponseCreator() {
+    /**
+     * Uses soapmocks.files.basedir to find files.
+     */
+    public Response() {
     }
 
     /**
      * @param baseDir
-     *            for finding the files to be found. Relative to
-     *            soapmocks.files.basedir or classpath
+     *            for finding the files. Relative to soapmocks.files.basedir or
+     *            classpath
      */
-    public ResponseCreator(String baseDir) {
+    public Response(String baseDir) {
 	if (baseDir == null) {
 	    throw new NullPointerException();
 	}
@@ -64,16 +67,15 @@ public final class ResponseCreator {
      * be able to create a record.
      * <p>
      * 
-     * @param classForT
+     * @param classForResponseType
      *            The type of the response object
-     * @param method
-     *            the method of the webservice
-     * @param parameters
-     *            any parameter string from request to indentify it
-     * @return Object to return in WebService
+     * @param Identifier
+     *            Identifier to find matching response
+     * @return RESPONSE_TYPE Object to return in WebService
      */
-    public <T> T using(Class<T> classForT, String method, String... parameters) {
-	return using(null, classForT, true, method, parameters);
+    public <RESPONSE_TYPE> RESPONSE_TYPE using(
+	    Class<RESPONSE_TYPE> classForResponseType, Identifier identifier) {
+	return using(classForResponseType, null, true, identifier);
     }
 
     /**
@@ -86,20 +88,20 @@ public final class ResponseCreator {
      * be able to create a record.
      * <p>
      * 
+     * @param classForResponseType
+     *            The type of the response object
      * @param elementResponse
      *            The element in the response file representing the response
      *            object
-     * @param classForT
-     *            The type of the response object
-     * @param method
-     *            the method of the webservice
-     * @param parameters
-     *            any parameter string from request to indentify it
+     * @param Identifier
+     *            Identifier to find matching response
      * @return Object to return in WebService
      */
-    public <T> T using(String elementResponse, Class<T> classForT,
-	    String method, String... parameters) {
-	return using(elementResponse, classForT, true, method, parameters);
+    public <RESPONSE_TYPE> RESPONSE_TYPE using(
+	    Class<RESPONSE_TYPE> classForResponseType, String elementResponse,
+	    Identifier requestIdentifier) {
+	return using(classForResponseType, elementResponse, true,
+		requestIdentifier);
     }
 
     /**
@@ -113,36 +115,39 @@ public final class ResponseCreator {
      * be able to create a record.
      * <p>
      * 
+     * @param classForResponseType
+     *            The type of the response object
      * @param elementResponse
      *            The element in the response file representing the response
      *            object
-     * @param classForT
-     *            The type of the response object
      * @param defaultXml
      *            true when a default xml shall be searched for
-     * @param method
-     *            the method of the webservice
-     * @param parameters
-     *            any parameter string from request to indentify it
+     * @param Identifier
+     *            Identifier to find matching response
      * @return Object to return in WebService
      */
-    public <T> T using(String elementResponse, Class<T> classForT,
-	    boolean defaultXml, String method, String... parameters) {
-	ProxyDelegator.serviceIdentifier(method, parameters);
+    public <RESPONSE_TYPE> RESPONSE_TYPE using(
+	    Class<RESPONSE_TYPE> classForResponseType, String elementResponse,
+	    boolean defaultXml, Identifier requestIdentifier) {
+	ProxyDelegator.serviceIdentifier(requestIdentifier.getMethod(),
+		requestIdentifier.getParameters());
 	String filename = new ResponseCreatorFileFinder()
-		.findFileFromMethodsAndParameter(baseDir, defaultXml, method,
-			parameters);
+		.findFileFromMethodsAndParameter(baseDir, defaultXml,
+			requestIdentifier.getMethod(),
+			requestIdentifier.getParameters());
 	if (filename == null) {
 	    throw new ProxyDelegateQuietException("file not found");
 	}
-	return using(filename, elementResponse, classForT);
+	return using(filename, elementResponse, classForResponseType);
     }
 
-    public <T> T using(String xmlfile, Class<T> classForT) {
+    public <RESPONSE_TYPE> RESPONSE_TYPE using(String xmlfile,
+	    Class<RESPONSE_TYPE> classForT) {
 	return using(xmlfile, null, classForT);
     }
 
-    public <T> T using(String xmlfile, String fromElement, Class<T> classForT) {
+    public <RESPONSE_TYPE> RESPONSE_TYPE using(String xmlfile,
+	    String fromElement, Class<RESPONSE_TYPE> classForT) {
 	if (fromElement == null) {
 	    String simpleName = classForT.getSimpleName();
 	    fromElement = Character.toLowerCase(simpleName.charAt(0))
@@ -165,14 +170,12 @@ public final class ResponseCreator {
 		    break;
 		}
 	    }
-	    if (!found) {
-		throw new ProxyDelegateQuietException(fromElement
-			+ " element not found in " + xmlfile);
-	    }
+	    throwExceptionIfNotFound(xmlfile, fromElement, found);
 	    JAXBContext jc;
 	    jc = JAXBContext.newInstance(classForT);
 	    Unmarshaller unmarshaller = jc.createUnmarshaller();
-	    JAXBElement<T> jaxbElement = unmarshaller.unmarshal(xsr, classForT);
+	    JAXBElement<RESPONSE_TYPE> jaxbElement = unmarshaller.unmarshal(
+		    xsr, classForT);
 	    xsr.close();
 	    fileInputStream.close();
 	    LOG.out("JaxWS ResponseFile: " + xmlfile);
@@ -181,6 +184,14 @@ public final class ResponseCreator {
 	    e.printStackTrace();
 	    ProxyDelegator.toProxy();
 	    throw new ProxyDelegateQuietException(e);
+	}
+    }
+
+    private void throwExceptionIfNotFound(String xmlfile, String fromElement,
+	    boolean found) {
+	if (!found) {
+	    throw new ProxyDelegateQuietException(fromElement
+		    + " element not found in " + xmlfile);
 	}
     }
 

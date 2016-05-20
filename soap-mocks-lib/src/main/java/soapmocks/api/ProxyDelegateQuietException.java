@@ -19,7 +19,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * Used in SoapMocks to handle {@link ResponseCreator} parts where files are not found or other things go wrong.
+ * Used in SoapMocks to handle {@link Response} parts where files are not found or other things go wrong.
  * Sets Proxy delegation on creation.
  */
 public final class ProxyDelegateQuietException extends RuntimeException {
