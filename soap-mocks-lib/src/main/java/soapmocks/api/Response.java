@@ -69,7 +69,7 @@ public final class Response {
      * 
      * @param classForResponseType
      *            The type of the response object
-     * @param Identifier
+     * @param identifier
      *            Identifier to find matching response
      * @return RESPONSE_TYPE Object to return in WebService
      */
@@ -93,15 +93,15 @@ public final class Response {
      * @param elementResponse
      *            The element in the response file representing the response
      *            object
-     * @param Identifier
+     * @param identifier
      *            Identifier to find matching response
      * @return Object to return in WebService
      */
     public <RESPONSE_TYPE> RESPONSE_TYPE using(
 	    Class<RESPONSE_TYPE> classForResponseType, String elementResponse,
-	    Identifier requestIdentifier) {
+	    Identifier identifier) {
 	return using(classForResponseType, elementResponse, true,
-		requestIdentifier);
+		identifier);
     }
 
     /**
@@ -122,19 +122,19 @@ public final class Response {
      *            object
      * @param defaultXml
      *            true when a default xml shall be searched for
-     * @param Identifier
+     * @param identifier
      *            Identifier to find matching response
      * @return Object to return in WebService
      */
     public <RESPONSE_TYPE> RESPONSE_TYPE using(
 	    Class<RESPONSE_TYPE> classForResponseType, String elementResponse,
-	    boolean defaultXml, Identifier requestIdentifier) {
-	ProxyDelegator.serviceIdentifier(requestIdentifier.getMethod(),
-		requestIdentifier.getParameters());
+	    boolean defaultXml, Identifier identifier) {
+	ProxyDelegator.serviceIdentifier(identifier.getMethod(),
+		identifier.getParameters());
 	String filename = new ResponseCreatorFileFinder()
 		.findFileFromMethodsAndParameter(baseDir, defaultXml,
-			requestIdentifier.getMethod(),
-			requestIdentifier.getParameters());
+			identifier.getMethod(),
+			identifier.getParameters());
 	if (filename == null) {
 	    throw new ProxyDelegateQuietException("file not found");
 	}
