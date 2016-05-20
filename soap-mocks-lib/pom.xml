@@ -3,7 +3,7 @@
 
 	<groupId>com.github.pbilstein.infrastructure-mocks</groupId>
 	<artifactId>soap-mocks-lib</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 	<name>com.github.pbilstein.infrastructuremocks:soap-mocks-lib</name>
 	<description>A library that can be used to mockup SOAP services and record proxy requests to other servers.</description>
