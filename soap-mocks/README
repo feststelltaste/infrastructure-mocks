@@ -15,15 +15,15 @@ Add SOAP Mocks
 	  is very easy to implement, but limited in its logic. The second one (JaxWs) 
 	  is more complicated, but you can add more logic on it using Java implementation.
 
-	* Add Generic Soap Mock
+	* Add Static-File-Mock
 
-	1. Add a .config file to folder /src/main/resources/generic_soap_mocks like this:
+	1. Add a .config file to folder /conf/static-files like this:
 	
 	url=/someservice/v1
 	responseFile=someservice-v1-response.xml
 	requestContains=someId4711
 	
-	2. Add the response file to be sent also to folder /src/main/resources/generic_soap_mocks
+	2. Add the response file to be sent also to folder /conf/static-files
 	
 	In this case: someservice-v1-response.xml containing the response xml.
 		
@@ -34,10 +34,7 @@ Add SOAP Mocks
 
 	* Add new JAXWS Services
 
-	1. add wsdl to /src/wsdl
-	
-	2. configure pom.xml and add section
-	
+	1. Add wsdl to /src/wsdl and configure pom.xml to add section
 		
 		<execution>
 			<id>HelloServiceWsdl</id>
@@ -54,7 +51,8 @@ Add SOAP Mocks
 			</configuration>
 		</execution>
 		
-	3. implement PortType (see example HelloWorldServiceMock) using @SoapMocksUrl annotation
+	2. Implement PortType (see example HelloWorldServiceMock) using @WebService annotation. 
+       The webservice URL will be taken from serviceName in @WebService.
 	
 
 License

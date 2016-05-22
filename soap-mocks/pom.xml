@@ -4,7 +4,7 @@
 
 	<groupId>com.github.pbilstein.infrastructuremocks</groupId>
 	<artifactId>soap-mocks</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>DEV-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>com.github.pbilstein.infrastructuremocks:soap-mocks</name>
 	<description>An application using soap-mocks-lib in an maven environment that uses embedded tomcat to start a server.</description>
@@ -45,7 +45,7 @@
 					<port>${mock.port}</port>
 					<systemProperties>
 						<CATALINA_OPTS>
-						-Djava.awt.headless=true -Dfile.encoding=UTF-8
+							-Djava.awt.headless=true -Dfile.encoding=UTF-8
 						</CATALINA_OPTS>
 						<soapmocks.files.basedir>${basedir}/conf</soapmocks.files.basedir>
 						<soapmocks.proxyrecord.dir>${basedir}/target/proxyrecords</soapmocks.proxyrecord.dir>
@@ -65,8 +65,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-		          <failOnMissingWebXml>false</failOnMissingWebXml>
-		        </configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
 			</plugin>
 
 			<!-- usage of jax-ws maven plugin -->
@@ -156,8 +156,18 @@
 		<dependency>
 			<groupId>com.github.pbilstein.infrastructure-mocks</groupId>
 			<artifactId>soap-mocks-lib</artifactId>
-			<version>DEV-SNAPSHOT</version>
+			<version>0.4</version>
 		</dependency>
+		<dependency>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-classic</artifactId>
+		  <version>1.0.13</version>
+		 </dependency>
+		 <dependency>
+		  <groupId>ch.qos.logback</groupId>
+		  <artifactId>logback-core</artifactId>
+		  <version>1.0.13</version>
+		 </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

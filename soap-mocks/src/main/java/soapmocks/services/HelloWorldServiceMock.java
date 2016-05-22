@@ -17,13 +17,11 @@ package soapmocks.services;
 
 import javax.jws.WebService;
 
-import soapmocks.api.Identifier;
+import soapmocks.api.RequestIdentifier;
 import soapmocks.api.Response;
-import soapmocks.api.SoapMockUrl;
 import soapmocks.generated.helloservice.HelloWorld;
 
-@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", name = "HelloWorldServiceMock", serviceName = "/WebService/services/HelloWorld", portName = "/WebService/services/HelloWorld")
-@SoapMockUrl(value = "/WebService/services/HelloWorld")
+@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", serviceName = "/WebService/services/HelloWorld", name = "HelloWorldServiceMock")
 public class HelloWorldServiceMock implements HelloWorld {
 
     Response responseCreator = new Response("/jaxws");
@@ -31,7 +29,7 @@ public class HelloWorldServiceMock implements HelloWorld {
     @Override
     public String sayHello(String name) {
 	String result = responseCreator.using(String.class, "sayHelloReturn",
-		Identifier.with("sayHello", name));
+		RequestIdentifier.with("sayHello", name));
 	return result;
     }
 
