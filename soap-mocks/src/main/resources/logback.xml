@@ -1,15 +1,15 @@
 <configuration>
 
   <appender name="soapmocks" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
+    <encoder>
       <Pattern>%X{counter}%m%n</Pattern>
-    </layout>
+    </encoder>
   </appender>
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
+    <encoder>
       <Pattern>%d %X{counter}%logger{36} - %m%n</Pattern>
-    </layout>
+    </encoder>
   </appender>
 
   <logger name="soapmocks" level="INFO">
