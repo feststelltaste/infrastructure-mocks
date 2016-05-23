@@ -15,6 +15,8 @@ limitations under the License.
  */
 package soapmocks.services;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class TestHelloWorldService {
@@ -23,7 +25,6 @@ public class TestHelloWorldService {
 
     @Test
     public void assureThatHelloServiceWorks() {
-	// assertEquals("Yeaaaah Hello me",
-	// helloWorldServiceMock.sayHello("me"));
+	assertEquals("yoya2", helloWorldServiceMock.sayHello("ui"));
     }
 }

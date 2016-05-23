@@ -17,8 +17,10 @@ package soapmocks.services;
 
 import javax.jws.WebService;
 
+import soapmocks.api.ProxyDelegator;
 import soapmocks.api.RequestIdentifier;
 import soapmocks.api.Response;
+import soapmocks.api.ResponseIdentifier;
 import soapmocks.generated.helloservice.HelloWorld;
 
 @WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", serviceName = "/WebService/services/HelloWorld", name = "HelloWorldServiceMock")
@@ -28,13 +30,21 @@ public class HelloWorldServiceMock implements HelloWorld {
 
     @Override
     public String sayHello(String name) {
-	String result = responseCreator.using(String.class, "sayHelloReturn",
-		RequestIdentifier.with("sayHello", name));
+	final String result = anotherMethod(name);
+	return result;
+    }
+
+    private String anotherMethod(String name) {
+	final String result = responseCreator.using(String.class,
+		ResponseIdentifier.with().elementHashExcludes("uga")
+			.elementResponse("sayHelloReturn").build(),
+		RequestIdentifier.by(name));
 	return result;
     }
 
     @Override
     public String sayHello2(String name) {
+	ProxyDelegator.toProxy();
 	return null;
     }
 }

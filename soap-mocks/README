@@ -51,7 +51,7 @@ Add SOAP Mocks
 			</configuration>
 		</execution>
 		
-	2. Implement PortType (see example HelloWorldServiceMock) using @WebService annotation. 
+	2. Implement PortType (see example HelloWorldServiceMock) using @WebService annotation in package soapmocks.services. 
        The webservice URL will be taken from serviceName in @WebService.
 	
 
