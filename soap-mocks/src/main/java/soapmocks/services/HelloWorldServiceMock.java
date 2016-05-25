@@ -17,13 +17,15 @@ package soapmocks.services;
 
 import javax.jws.WebService;
 
+import soapmocks.api.ContextPath;
 import soapmocks.api.ProxyDelegator;
 import soapmocks.api.RequestIdentifier;
 import soapmocks.api.Response;
 import soapmocks.api.ResponseIdentifier;
 import soapmocks.generated.helloservice.HelloWorld;
 
-@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld", serviceName = "/WebService/services/HelloWorld", name = "HelloWorldServiceMock")
+@WebService(endpointInterface = "soapmocks.generated.helloservice.HelloWorld")
+@ContextPath("/WebService/services/HelloWorld")
 public class HelloWorldServiceMock implements HelloWorld {
 
     Response responseCreator = new Response("/jaxws");
