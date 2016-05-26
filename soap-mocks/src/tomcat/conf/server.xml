@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<Server port="12005" shutdown="SHUTDOWN">
+<Server port="${soapmocks.shutdown.port}" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
@@ -24,9 +24,9 @@
 
   <Service name="Catalina">
 
-    <Connector port="12080" protocol="HTTP/1.1"
+    <Connector port="${soapmocks.http.port}" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="12443" />
+               redirectPort="${soapmocks.https.port}" />
 
     <Engine name="Catalina" defaultHost="localhost">
 
