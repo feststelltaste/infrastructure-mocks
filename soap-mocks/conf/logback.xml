@@ -1,0 +1,21 @@
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <Pattern>%d %X{counter}%logger{36} - %m%n</Pattern>
+    </encoder>
+  </appender>
+
+  <appender name="soapmocks" class="ch.qos.logback.core.FileAppender">
+		<file>${catalina.home}/logs/soapmocks.log</file>
+		<encoder>
+			<pattern>%d %X{counter}%logger{36} - %m%n</pattern>
+		</encoder>
+  </appender>
+
+  <root level="DEBUG">          
+    <appender-ref ref="soapmocks" />
+    <appender-ref ref="STDOUT" />
+  </root>  
+  
+</configuration>

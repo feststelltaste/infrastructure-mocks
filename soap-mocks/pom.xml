@@ -31,12 +31,34 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<mock.port>12080</mock.port>
+		<tomcat.version>8.0.33</tomcat.version>
 	</properties>
 
 	<build>
 		<finalName>soap-mocks</finalName>
 		<plugins>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<id>unpack-tomcat</id>
+						<phase>install</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>org.apache.tomcat</includeGroupIds>
+							<includeArtifactIds>tomcat</includeArtifactIds>
+							<version>${tomcat.version}</version>
+							<outputDirectory>
+								${project.build.directory}
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -67,6 +89,97 @@
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>install</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<filesets>
+								<fileset>
+									<directory>${project.build.directory}/apache-tomcat-${tomcat.version}/webapps</directory>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apache-tomcat-${tomcat.version}/webapps</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}</directory>
+									<includes>
+										<include>soap-mocks.war</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-2</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apache-tomcat-${tomcat.version}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/tomcat</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-3</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apache-tomcat-${tomcat.version}/conf-soapmocks</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/conf</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<descriptor>${basedir}/src/assembly/tomcat.xml</descriptor>
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-archive</id>
+						<phase>install</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- usage of jax-ws maven plugin -->
@@ -156,18 +269,24 @@
 		<dependency>
 			<groupId>com.github.pbilstein.infrastructure-mocks</groupId>
 			<artifactId>soap-mocks-lib</artifactId>
-			<version>0.11</version>
+			<version>0.12</version>
 		</dependency>
 		<dependency>
-		  <groupId>ch.qos.logback</groupId>
-		  <artifactId>logback-classic</artifactId>
-		  <version>1.0.13</version>
-		 </dependency>
-		 <dependency>
-		  <groupId>ch.qos.logback</groupId>
-		  <artifactId>logback-core</artifactId>
-		  <version>1.0.13</version>
-		 </dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat</artifactId>
+			<version>${tomcat.version}</version>
+			<type>tar.gz</type>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

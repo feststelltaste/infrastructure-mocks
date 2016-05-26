@@ -35,7 +35,7 @@ limitations under the License.
 
 	<target name="cleanStartMocksIfNeeded" depends="checkTomcatRunning" unless="tomcat.started">
 		<mkdir dir="${mocks.log.dir}" />
-		<mvn mavenTargets="clean install tomcat7:run" mavenopts="${maven.opts}" />
+		<mvn mavenTargets="clean package tomcat7:run" mavenopts="${maven.opts}" />
 	</target>
 
 	<target name="stopMocks" depends="checkTomcatRunning" if="${tomcat.started}">
