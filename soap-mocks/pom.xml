@@ -270,7 +270,7 @@
 		<dependency>
 			<groupId>com.github.pbilstein.infrastructure-mocks</groupId>
 			<artifactId>soap-mocks-lib</artifactId>
-			<version>0.13</version>
+			<version>0.14</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
