@@ -71,6 +71,7 @@
 						</CATALINA_OPTS>
 						<soapmocks.files.basedir>${basedir}/conf</soapmocks.files.basedir>
 						<soapmocks.proxyrecord.dir>${basedir}/target/proxyrecords</soapmocks.proxyrecord.dir>
+						<!-- soapmocks.jaxws.nomock.methods.force>sayHello</soapmocks.jaxws.nomock.methods.force -->
 					</systemProperties>
 				</configuration>
 			</plugin>
@@ -269,7 +270,7 @@
 		<dependency>
 			<groupId>com.github.pbilstein.infrastructure-mocks</groupId>
 			<artifactId>soap-mocks-lib</artifactId>
-			<version>0.12</version>
+			<version>0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
