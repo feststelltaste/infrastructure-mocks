@@ -15,44 +15,44 @@ Add SOAP Mocks
 	  is very easy to implement, but limited in its logic. The second one (JaxWs) 
 	  is more complicated, but you can add more logic on it using Java implementation.
 
-	* Add Static-File-Mock
+	Add Static-File-Mock
 
-	1. Add a .config file to folder /conf/static-files like this:
-	
-	url=/someservice/v1
-	responseFile=someservice-v1-response.xml
-	requestContains=someId4711
-	
-	2. Add the response file to be sent also to folder /conf/static-files
-	
-	In this case: someservice-v1-response.xml containing the response xml.
+		1. Add a .config file to folder /conf/static-files like this:
 		
-	That's it!
-	
-	/soap-mocks/someservice/v1 will serve what you want
+		url=/someservice/v1
+		responseFile=someservice-v1-response.xml
+		requestContains=someId4711
+		
+		2. Add the response file to be sent also to folder /conf/static-files
+		
+		In this case: someservice-v1-response.xml containing the response xml.
+			
+		That's it!
+		
+		/soap-mocks/someservice/v1 will serve what you want
 
 
 	* Add new JAXWS Services
 
-	1. Add wsdl to /src/wsdl and configure pom.xml to add section
-		
-		<execution>
-			<id>HelloServiceWsdl</id>
-			<goals>
-				<goal>wsimport</goal>
-			</goals>
-			<configuration>
-				<wsdlFiles>
-					<wsdlFile>HelloService.wsdl</wsdlFile>
-				</wsdlFiles>
-				<packageName>soapmocks.generated.helloservice</packageName>
-				<!-- Without this, multiple WSDLs won't be processed :( -->
-				<staleFile>${project.build.directory}/jaxws/stale/wsdl.HelloServiceWsdl.done</staleFile>
-			</configuration>
-		</execution>
-		
-	2. Implement PortType (see example HelloWorldServiceMock) using @WebService annotation in package soapmocks.services. 
-       The webservice URL will be taken from serviceName in @WebService.
+		1. Add wsdl to /src/wsdl and configure pom.xml to add section
+			
+			<execution>
+				<id>HelloServiceWsdl</id>
+				<goals>
+					<goal>wsimport</goal>
+				</goals>
+				<configuration>
+					<wsdlFiles>
+						<wsdlFile>HelloService.wsdl</wsdlFile>
+					</wsdlFiles>
+					<packageName>soapmocks.generated.helloservice</packageName>
+					<!-- Without this, multiple WSDLs won't be processed :( -->
+					<staleFile>${project.build.directory}/jaxws/stale/wsdl.HelloServiceWsdl.done</staleFile>
+				</configuration>
+			</execution>
+			
+		2. Implement PortType (see example HelloWorldServiceMock) using @WebService annotation in package soapmocks.services. 
+	       The webservice URL will be taken from serviceName in @WebService.
 	
 
 License
